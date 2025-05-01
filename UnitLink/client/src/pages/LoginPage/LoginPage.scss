@@ -1,0 +1,128 @@
+// Базові змінні (можна винести в окремий файл _variables.scss пізніше)
+$primary-color: #3498db;
+$secondary-color: #2ecc71;
+$background-color: #f4f7f6;
+$container-bg-color: #ffffff;
+$text-color: #333;
+$border-color: #ccc;
+$error-color: #e74c3c;
+$input-focus-border: darken($primary-color, 10%);
+
+// Міксін для кнопок (приклад)
+@mixin button-style($bg-color, $text-color: white) {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: $bg-color;
+    color: $text-color;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+
+    &:hover {
+        background-color: darken($bg-color, 10%);
+    }
+
+    &:active {
+        background-color: darken($bg-color, 15%);
+    }
+
+    &:disabled {
+        background-color: lighten($bg-color, 20%);
+        cursor: not-allowed;
+    }
+}
+
+// Стилі для сторінки логіну
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; // Займає всю висоту екрану
+    background-color: $background-color;
+    padding: 20px; // Відступи для мобільних пристроїв
+}
+
+.login-container {
+    background-color: $container-bg-color;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px; // Обмеження максимальної ширини контейнера
+    text-align: center;
+}
+
+.login-title {
+    color: $primary-color;
+    margin-bottom: 15px;
+    font-size: 2rem; // Збільшений розмір заголовка
+}
+
+.login-description {
+    color: darken($text-color, 10%);
+    margin-bottom: 30px;
+    font-size: 1rem;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; // Відстань між елементами форми
+
+    .form-group {
+        text-align: left; // Вирівнювання тексту в групі полів
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: $text-color;
+        }
+
+        input[type='text'],
+        input[type='password'] {
+            width: 100%; // Займає всю доступну ширину
+            padding: 10px 12px;
+            border: 1px solid $border-color;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box; // Важливо для правильного розрахунку ширини
+
+            &:focus {
+                outline: none;
+                border-color: $input-focus-border;
+                box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+            }
+        }
+    }
+
+    .btn-login {
+        @include button-style($primary-color);
+        margin-top: 10px; // Додатковий відступ зверху
+    }
+}
+
+.registration-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid $border-color; // Розділювач
+
+    p {
+        margin-bottom: 10px;
+        color: $text-color;
+    }
+
+    .btn-register {
+        @include button-style($secondary-color);
+        width: 100%; // Кнопка на всю ширину
+    }
+
+    .registration-note {
+        margin-top: 15px;
+        font-size: 0.9rem;
+        color: lighten($text-color, 20%);
+    }
+}
