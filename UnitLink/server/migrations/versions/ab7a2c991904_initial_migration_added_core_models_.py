@@ -178,6 +178,3 @@ else:
     except Exception as e:
         db.session.rollback()
         print(f"Помилка при створенні адміністратора: {e}")
-
-# Вихід з flask shell
-# exit() або Ctrl+Z (Windows) / Ctrl+D (Linux/macOS)

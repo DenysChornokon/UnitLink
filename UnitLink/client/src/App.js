@@ -1,15 +1,35 @@
+// src/App.js
 import React from "react";
-import LoginPage from "./pages/LoginPage/LoginPage"; // Імпортуємо нашу сторінку
-// Якщо у вас є глобальний CSS/SCSS, імпортуйте його тут
-// import './index.css'; // або './App.scss', etc.
+// BrowserRouter тепер в index.js, тому тут не потрібен
+import { Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./pages/LoginPage/LoginPage";
+import DashboardPage from "./pages/DashboardPage/DashboardPage";
+import { useAuth } from "./contexts/AuthContext"; // <--- Імпортуємо хук useAuth
 
 function App() {
-  // На даному етапі просто повертаємо LoginPage
-  // В майбутньому тут буде логіка маршрутизації
+  const { isAuthenticated } = useAuth(); // <--- Отримуємо статус автентифікації з контексту
+
   return (
-    <div className="App">
-      <LoginPage />
-    </div>
+    // BrowserRouter вже огортає цей компонент в index.js
+    <Routes>
+      {/* Використовуємо isAuthenticated з контексту */}
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
+      />
+
+      <Route
+        path="/dashboard"
+        element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />}
+      />
+
+      <Route
+        path="/"
+        element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}
+      />
+
+      <Route path="*" element={<div>404 Not Found</div>} />
+    </Routes>
   );
 }
 
