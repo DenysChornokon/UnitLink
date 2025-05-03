@@ -54,16 +54,17 @@ class RegistrationRequest(db.Model):
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     requested_username = db.Column(db.String(80), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
-    reason = db.Column(db.Text, nullable=True) # Причина запиту
-    status = db.Column(db.Enum(RegistrationRequestStatus), nullable=False, default=RegistrationRequestStatus.PENDING)
+    email = db.Column(db.String(120), nullable=False, index=True) # Додамо індекс для email
+    full_name = db.Column(db.String(150), nullable=False) # <--- Нове поле: ПІБ
+    rank = db.Column(db.String(100), nullable=True)      # <--- Нове поле: Звання (опціонально)
+    reason = db.Column(db.Text, nullable=True)
+    status = db.Column(db.Enum(RegistrationRequestStatus), nullable=False, default=RegistrationRequestStatus.PENDING, index=True) # Індекс для статусу
     requested_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    # Зв'язок з адміністратором, який розглянув запит
     reviewed_by_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=True)
     reviewed_at = db.Column(db.DateTime(timezone=True), nullable=True)
 
     reviewer = db.relationship('User', backref=db.backref('registration_requests_reviewed', lazy=True), foreign_keys=[reviewed_by_user_id])
 
-
     def __repr__(self):
-        return f'<RegistrationRequest {self.email} ({self.status.name})>'
+        # Оновимо repr для наочності
+        return f'<RegistrationRequest {self.email} - {self.full_name} ({self.status.name})>'

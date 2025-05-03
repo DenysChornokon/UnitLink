@@ -12,7 +12,7 @@ class Config:
     """Базовий клас конфігурації."""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-should-really-change-this'
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or SECRET_KEY
-    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(seconds=30)
     JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(days=30)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # За замовчуванням використовуємо SQLite, якщо DATABASE_URL не встановлено

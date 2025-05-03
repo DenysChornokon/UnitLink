@@ -1,37 +1,24 @@
-import axios from "axios";
+// src/services/authService.js
+import apiClient from "./api"; // <--- Імпортуємо налаштований екземпляр
 
-// Використовуємо змінну середовища для базового URL
-const API_URL = process.env.REACT_APP_API_BASE_URL + "/api/auth";
+// Замість базового axios використовуємо apiClient
+// Базовий URL вже налаштований в apiClient, тому шляхи відносні
 
-/**
- * Надсилає запит на логін користувача
- * @param {object} credentials - Об'єкт з { username, password }
- * @returns {Promise<object>} - Проміс з даними відповіді (включаючи токени)
- */
 const loginUser = async (credentials) => {
   try {
-    // Надсилаємо POST-запит на /api/auth/login
-    const response = await axios.post(`${API_URL}/login`, credentials);
-    // Повертаємо дані з відповіді (зазвичай містить токени, роль і т.д.)
+    // apiClient вже має базовий URL /api/auth/login
+    const response = await apiClient.post("/api/auth/login", credentials);
     return response.data;
   } catch (error) {
-    // Обробляємо помилки (наприклад, 401 Unauthorized)
     console.error("Login API error:", error.response || error.message);
-    // Перекидаємо помилку далі, щоб компонент міг її обробити
-    // Додаємо дані відповіді помилки, якщо вони є, для відображення повідомлення
     throw error.response?.data || new Error("Login failed");
   }
 };
 
-/**
- * Надсилає запит на реєстрацію (заявку)
- * @param {object} requestData - Об'єкт з { requested_username, email, reason }
- * @returns {Promise<object>} - Проміс з даними відповіді
- */
 const registerRequest = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API_URL}/register_request`,
+    const response = await apiClient.post(
+      "/api/auth/register_request",
       requestData
     );
     return response.data;
@@ -44,11 +31,28 @@ const registerRequest = async (requestData) => {
   }
 };
 
-// Експортуємо функції сервісу
+// Функція для виклику бекенд-логауту
+const logoutUser = async () => {
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!refreshToken) return; // Нічого робити, якщо немає рефреш токена
+
+  try {
+    // Надсилаємо запит на бекенд для інвалідації токена
+    await apiClient.delete("/api/auth/logout", {
+      headers: { Authorization: `Bearer ${refreshToken}` },
+    });
+    console.log("Logout request sent to backend.");
+  } catch (error) {
+    // Помилка тут не критична для виходу на фронтенді, але її варто залогувати
+    console.error("Backend logout API error:", error.response || error.message);
+    // Не кидаємо помилку, щоб вихід на фронтенді все одно відбувся
+  }
+};
+
 const authService = {
   loginUser,
   registerRequest,
-  // Тут можна додати logout, refresh token і т.д.
+  logoutUser, // <--- Додано logoutUser
 };
 
 export default authService;

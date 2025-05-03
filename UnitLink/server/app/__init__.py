@@ -17,6 +17,7 @@ cors = CORS() # Ініціалізуємо CORS
 socketio = SocketIO(async_mode='threading')
 
 
+
 def create_app(config_name='default'):
     app = Flask(__name__)
     app_config = config[config_name]
@@ -27,6 +28,7 @@ def create_app(config_name='default'):
     jwt.init_app(app)
     cors.init_app(app, resources={r"/api/*": {"origins": app_config.CORS_ORIGINS}})
     socketio.init_app(app, cors_allowed_origins=app_config.CORS_ORIGINS.split(',') if app_config.CORS_ORIGINS else '*')
+
 
     # --- Імпорт моделей ---
     # Це важливо зробити тут, щоб моделі були зареєстровані в SQLAlchemy та Flask-Migrate
