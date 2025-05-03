@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity # Імпортуємо jwt_required та get_jwt_identity
 # from app import socketio # Можна імпортувати для надсилання повідомлень
-from app.models import Device # Імпортуємо модель Device
+from app.models import Device, DeviceStatus  # Імпортуємо модель Device
 
 device_bp = Blueprint('devices', __name__)
 

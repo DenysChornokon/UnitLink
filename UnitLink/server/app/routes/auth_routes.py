@@ -56,14 +56,18 @@ def register_request():
     if not data:
         return jsonify({"message": "Request body must be JSON"}), 400
 
+    # Отримуємо нові поля
     requested_username = data.get('requested_username')
     email = data.get('email')
-    reason = data.get('reason', '') # Причина опціональна
+    full_name = data.get('full_name') # <--- Нове
+    rank = data.get('rank')           # <--- Нове
+    reason = data.get('reason', '')
 
-    if not requested_username or not email:
-        return jsonify({"message": "Missing requested username or email"}), 400
+    # Додаємо перевірку обов'язкових полів
+    if not requested_username or not email or not full_name:
+        return jsonify({"message": "Missing required fields: requested_username, email, full_name"}), 400
 
-    # (Опціонально) Перевірка, чи не існує вже користувач або активний запит з такими даними
+    # ...(перевірка на існуючих користувачів/запити як раніше)...
     existing_user = User.query.filter((User.username == requested_username) | (User.email == email)).first()
     existing_request = RegistrationRequest.query.filter(
         (RegistrationRequest.email == email) | (RegistrationRequest.requested_username == requested_username),
@@ -73,12 +77,14 @@ def register_request():
     if existing_user:
         return jsonify({"message": "User with this username or email already exists."}), 409 # Conflict
     if existing_request:
-         return jsonify({"message": "A pending registration request with this username or email already exists."}), 409 # Conflict
+        return jsonify({"message": "A pending registration request with this username or email already exists."}), 409 # Conflict
 
-    # Створюємо новий запит
+    # Створюємо новий запит з новими полями
     new_request = RegistrationRequest(
         requested_username=requested_username,
         email=email,
+        full_name=full_name, # <--- Нове
+        rank=rank,           # <--- Нове
         reason=reason,
         status=RegistrationRequestStatus.PENDING
     )
@@ -86,11 +92,11 @@ def register_request():
     db.session.add(new_request)
     try:
         db.session.commit()
-        # TODO: Додати логіку сповіщення адміністратора (наприклад, email)
-        return jsonify({"message": "Registration request submitted successfully. Waiting for administrator approval."}), 201 # Created
+        # TODO: Сповіщення адміністратора
+        return jsonify({"message": "Registration request submitted successfully. Waiting for administrator approval."}), 201
     except Exception as e:
         db.session.rollback()
-        # TODO: Логування помилки
+        # TODO: Логування
         print(f"Error saving registration request: {e}")
         return jsonify({"message": "Failed to submit registration request due to an internal error."}), 500
 

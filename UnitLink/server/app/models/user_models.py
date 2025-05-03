@@ -24,11 +24,6 @@ class User(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
     last_login_at = db.Column(db.DateTime(timezone=True), nullable=True)
 
-    # Зв'язки (приклади, додамо конкретні при необхідності)
-    # devices_added = db.relationship('Device', backref='adder', lazy=True, foreign_keys='Device.added_by_user_id')
-    # alerts_acknowledged = db.relationship('Alert', backref='acknowledger', lazy=True, foreign_keys='Alert.acknowledged_by_user_id')
-    # registration_requests_reviewed = db.relationship('RegistrationRequest', backref='reviewer', lazy=True, foreign_keys='RegistrationRequest.reviewed_by_user_id')
-
     def set_password(self, password):
         """Хешує пароль за допомогою bcrypt."""
         # Важливо декодувати пароль і хеш для зберігання як рядки

@@ -1,147 +1,118 @@
+// src/pages/LoginPage/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext"; // Імпортуємо хук useAuth
-import authService from "../../services/authService"; // Імпортуємо для запиту на реєстрацію
-import "./LoginPage.scss"; // Імпортуємо стилі
+import { useAuth } from "../../contexts/AuthContext";
+// Імпорт компонента модального вікна, який ми створили
+import RegistrationRequestModal from "../../components/RegistrationRequestModal/RegistrationRequestModal";
+import "./LoginPage.scss";
 
 const LoginPage = () => {
-  // Локальні стани для полів форми, помилок та індикатора завантаження
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null); // Помилка для форми логіну
   const [isLoading, setIsLoading] = useState(false);
-
-  // Хук для навігації після успішного логіну
+  const [isModalOpen, setIsModalOpen] = useState(false); // <--- Стан для модалки
   const navigate = useNavigate();
-  // Отримуємо функцію login з нашого AuthContext
   const { login } = useAuth();
 
-  // Обробник відправки форми логіну
   const handleLoginSubmit = async (event) => {
-    event.preventDefault(); // Запобігаємо стандартній поведінці форми
-    setIsLoading(true); // Встановлюємо індикатор завантаження
-    setError(null); // Скидаємо попередні помилки
-
-    try {
-      // Викликаємо функцію login з контексту, передаючи облікові дані
-      // Ця функція всередині викличе authService.loginUser,
-      // оновить стан контексту та збереже токени в localStorage
-      await login({ username, password });
-
-      // Якщо функція login відпрацювала без помилок,
-      // стан автентифікації оновлено в контексті.
-      // Тепер можна перенаправляти користувача.
-      navigate("/dashboard");
-    } catch (err) {
-      // Якщо login кинув помилку (неправильні дані, помилка сервера),
-      // відображаємо її користувачу.
-      const errorMessage =
-        err.message || "Login failed. Please check your credentials.";
-      setError(errorMessage);
-      console.error("Login component failed:", err); // Лог для розробника
-    } finally {
-      // Незалежно від результату, прибираємо індикатор завантаження
-      setIsLoading(false);
-    }
-  };
-
-  // Обробник для кнопки запиту реєстрації
-  // (Можна розширити, додавши форму для введення даних)
-  const handleRegistrationRequest = async () => {
-    // Тут можна додати логіку відображення модального вікна або окремої форми
-    // для введення 'requested_username', 'email', 'reason'
-    // Або тимчасово використати статичні дані для тесту:
-    const testRequestData = {
-      requested_username: `testuser_${Date.now()}`.slice(0, 15), // Генеруємо унікальне ім'я
-      email: `test_${Date.now()}@test.local`, // Генеруємо унікальний email
-      reason: "Automated test registration request",
-    };
-
-    setIsLoading(true); // Показуємо завантаження і для цієї кнопки
+    event.preventDefault();
+    setIsLoading(true);
     setError(null);
 
     try {
-      const data = await authService.registerRequest(testRequestData);
-      alert("Registration request submitted: " + data.message); // Показуємо відповідь сервера
+      await login({ username, password });
+      navigate("/dashboard");
     } catch (err) {
-      const errorMessage = err.message || "Registration request failed.";
-      setError(errorMessage); // Показуємо помилку
-      console.error("Registration request failed:", err);
+      setError(err.message || "Login failed. Please check your credentials.");
+      console.error("Login component failed:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // JSX розмітка компонента
+  // Ця функція ТІЛЬКИ відкриває модальне вікно
+  const handleOpenRegistrationModal = () => {
+    setIsModalOpen(true);
+  };
+
+  // Функція для закриття модального вікна (передається в компонент модалки)
+  const handleCloseRegistrationModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <div className="login-page">
-      <div className="login-container">
-        <h1 className="login-title">UnitLink Monitoring</h1>
-        <p className="login-description">
-          System for monitoring communication channels. Please log in to
-          continue.
-        </p>
-
-        {/* Блок для відображення помилок логіну або реєстрації */}
-        {error && <p className="error-message">{error}</p>}
-
-        {/* Форма логіну */}
-        <form className="login-form" onSubmit={handleLoginSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Username or Email</label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              // Оновлюємо стан при зміні значення поля
-              onChange={(e) => setUsername(e.target.value)}
-              required // Поле обов'язкове
-              autoComplete="username"
-              // Блокуємо поле під час відправки запиту
-              disabled={isLoading}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              // Оновлюємо стан при зміні значення поля
-              onChange={(e) => setPassword(e.target.value)}
-              required // Поле обов'язкове
-              autoComplete="current-password"
-              // Блокуємо поле під час відправки запиту
-              disabled={isLoading}
-            />
-          </div>
-          {/* Кнопка відправки форми */}
-          <button type="submit" className="btn btn-login" disabled={isLoading}>
-            {/* Змінюємо текст кнопки під час завантаження */}
-            {isLoading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-
-        {/* Секція запиту на реєстрацію */}
-        <div className="registration-section">
-          <p>Don't have an account?</p>
-          <button
-            type="button" // Важливо: type="button", щоб не сабмітити форму логіну
-            className="btn btn-register"
-            onClick={handleRegistrationRequest}
-            // Блокуємо кнопку під час будь-якого запиту
-            disabled={isLoading}
-          >
-            Request Registration
-          </button>
-          <p className="registration-note">
-            (Registration requires administrator approval)
+    <>
+      {" "}
+      {/* Огортаємо фрагментом, щоб додати модалку */}
+      <div className="login-page">
+        <div className="login-container">
+          <h1 className="login-title">UnitLink Monitoring</h1>
+          <p className="login-description">
+            System for monitoring communication channels. Please log in to
+            continue.
           </p>
+
+          {/* Відображення помилки тільки для логіну */}
+          {error && <p className="error-message login-error">{error}</p>}
+
+          <form className="login-form" onSubmit={handleLoginSubmit}>
+            <div className="form-group">
+              <label htmlFor="username">Username or Email</label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                autoComplete="username"
+                disabled={isLoading}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                disabled={isLoading}
+              />
+            </div>
+            <button
+              type="submit"
+              className="btn btn-login"
+              disabled={isLoading}
+            >
+              {isLoading ? "Logging in..." : "Login"}
+            </button>
+          </form>
+
+          <div className="registration-section">
+            <p>Don't have an account?</p>
+            <button
+              type="button"
+              className="btn btn-register"
+              onClick={handleOpenRegistrationModal} // <--- Викликає відкриття модалки
+              disabled={isLoading} // Можна блокувати, поки йде логін
+            >
+              Request Registration
+            </button>
+            <p className="registration-note">
+              (Registration requires administrator approval)
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+      {/* Рендеримо модальне вікно тут, передаючи стан і функцію закриття */}
+      <RegistrationRequestModal
+        isOpen={isModalOpen}
+        onClose={handleCloseRegistrationModal}
+      />
+    </>
   );
 };
 
-// Експортуємо компонент для використання в інших частинах додатку (напр. App.js)
 export default LoginPage;

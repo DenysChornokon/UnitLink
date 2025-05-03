@@ -1,12 +1,4 @@
-// Базові змінні (можна винести в окремий файл _variables.scss пізніше)
-$primary-color: #3498db;
-$secondary-color: #2ecc71;
-$background-color: #f4f7f6;
-$container-bg-color: #ffffff;
-$text-color: #333;
-$border-color: #ccc;
-$error-color: #e74c3c;
-$input-focus-border: darken($primary-color, 10%);
+@import '../../styles/_variables';
 
 // Міксін для кнопок (приклад)
 @mixin button-style($bg-color, $text-color: white) {

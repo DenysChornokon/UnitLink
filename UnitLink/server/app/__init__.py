@@ -18,6 +18,7 @@ socketio = SocketIO(async_mode='threading')
 
 
 
+
 def create_app(config_name='default'):
     app = Flask(__name__)
     app_config = config[config_name]
@@ -39,6 +40,8 @@ def create_app(config_name='default'):
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     from .routes.device_routes import device_bp
     app.register_blueprint(device_bp, url_prefix='/api/devices')
+    from .routes.admin_routes import admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')
 
     # --- Імпорт обробників SocketIO ---
     from . import socket_handlers

@@ -1,0 +1,141 @@
+@import '../../styles/_variables';
+
+// Стилі для фону (overlay)
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: $overlay-bg-color;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; // Має бути вище за інші елементи
+}
+
+// Стилі для самого вікна
+.modal-content {
+    background: $modal-bg-color;
+    padding: 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px; // Максимальна ширина вікна
+    position: relative; // Для позиціонування кнопки закриття, якщо потрібно
+    outline: none; // Забираємо стандартний outline
+
+    h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: $primary-color;
+        text-align: center;
+    }
+}
+
+// Стилі для форми всередині модалки
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; // Відстань між групами полів
+
+    .form-group {
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: $text-color;
+            font-size: 0.9rem;
+        }
+
+        input[type='text'],
+        input[type='email'],
+        textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid $border-color;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+
+            &:focus {
+                outline: none;
+                border-color: darken($primary-color, 10%);
+                box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+            }
+
+            &:disabled {
+                background-color: #eee;
+            }
+        }
+
+        textarea {
+            resize: vertical; // Дозволяємо змінювати висоту
+        }
+    }
+}
+
+// Стилі для кнопок дій (Submit, Cancel)
+.modal-actions {
+    display: flex;
+    justify-content: flex-end; // Кнопки справа
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+
+    .btn {
+        // Загальні стилі для кнопок (можна винести в глобальні)
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease;
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+
+    .btn-primary {
+        background-color: $primary-color;
+        color: white;
+
+        &:hover:not(:disabled) {
+            background-color: darken($primary-color, 10%);
+        }
+    }
+
+    .btn-secondary {
+        background-color: #ccc;
+        color: #333;
+
+        &:hover:not(:disabled) {
+            background-color: darken(#ccc, 10%);
+        }
+    }
+}
+
+// Стилі для повідомлень
+.error-message,
+.success-message {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.error-message {
+    color: $error-color;
+    background-color: lighten($error-color, 40%);
+    border: 1px solid lighten($error-color, 20%);
+}
+
+.success-message {
+    color: darken($success-color, 10%);
+    background-color: lighten($success-color, 45%);
+    border: 1px solid lighten($success-color, 20%);
+}
