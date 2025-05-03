@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_socketio import SocketIO
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS # Імпортуємо CORS
+from flask_mail import Mail
 from config import config # Імпортуємо словник конфігурацій
 
 # Ініціалізуємо розширення без прив'язки до додатку
@@ -15,8 +16,7 @@ cors = CORS() # Ініціалізуємо CORS
 # 'threading', 'eventlet', 'gevent', 'gevent_uwsgi'
 # Для початку 'threading' достатньо
 socketio = SocketIO(async_mode='threading')
-
-
+mail = Mail()
 
 
 def create_app(config_name='default'):
@@ -29,6 +29,7 @@ def create_app(config_name='default'):
     jwt.init_app(app)
     cors.init_app(app, resources={r"/api/*": {"origins": app_config.CORS_ORIGINS}})
     socketio.init_app(app, cors_allowed_origins=app_config.CORS_ORIGINS.split(',') if app_config.CORS_ORIGINS else '*')
+    mail.init_app(app)
 
 
     # --- Імпорт моделей ---

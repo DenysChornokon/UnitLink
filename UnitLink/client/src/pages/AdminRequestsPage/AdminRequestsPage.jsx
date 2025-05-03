@@ -7,6 +7,12 @@ const AdminRequestsPage = () => {
   const [requests, setRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [processInfo, setProcessInfo] = useState({
+    requestId: null,
+    url: null,
+    message: null,
+    instruction: null,
+  }); // Ініціалізуємо зі значеннями null
   const { currentUser } = useAuth(); // Перевіряємо роль (хоча маршрут вже захищений)
 
   // Функція для завантаження запитів
@@ -31,19 +37,29 @@ const AdminRequestsPage = () => {
   const handleApprove = async (requestId) => {
     if (
       !window.confirm(
-        "Are you sure you want to approve this request? A new inactive user will be created."
+        "Are you sure you want to approve this request? You will need to securely provide the setup link to the user."
       )
     )
-      return;
+      return; // Оновлено текст
+    setProcessInfo({ requestId: null, url: null, message: null }); // Скидаємо попереднє повідомлення
+    setError(null);
     try {
+      // Викликаємо API схвалення
       const response = await adminService.approveRequest(requestId);
-      alert(response.message || "Request approved successfully!");
+
+      // Показуємо повідомлення та URL адміну
+      setProcessInfo({
+        requestId: requestId, // Зберігаємо ID, щоб знати до якого запиту відноситься URL
+        url: response.setup_url,
+        message: response.message || "Request approved successfully!",
+      });
+
       // Оновлюємо список, видаливши оброблений запит
       setRequests((prevRequests) =>
         prevRequests.filter((req) => req.id !== requestId)
       );
     } catch (err) {
-      alert(`Error approving request: ${err.message}`);
+      setError(`Error approving request ${requestId}: ${err.message}`); // Показуємо помилку
     }
   };
 
@@ -62,6 +78,19 @@ const AdminRequestsPage = () => {
     }
   };
 
+  // Функція для копіювання URL в буфер обміну
+  const copyToClipboard = (url) => {
+    navigator.clipboard.writeText(url).then(
+      () => {
+        alert("Setup link copied to clipboard!");
+      },
+      (err) => {
+        alert("Failed to copy link. Please copy it manually.");
+        console.error("Clipboard copy failed: ", err);
+      }
+    );
+  };
+
   // Додаткова перевірка ролі на клієнті (хоча основний захист - на рівні маршрутизації)
   if (currentUser?.role !== "ADMIN") {
     return <p>Access Denied. Administrator privileges required.</p>;
@@ -73,12 +102,42 @@ const AdminRequestsPage = () => {
       {isLoading && <p>Loading requests...</p>}
       {error && <p className="error-message">{error}</p>}
 
-      {!isLoading && !error && requests.length === 0 && (
-        <p>No pending registration requests found.</p>
+      {/* Повідомлення після схвалення з посиланням */}
+      {processInfo.url && (
+        <div className="process-info success-message">
+          <p>
+            <strong>{processInfo.message}</strong>
+          </p>
+          <p>
+            <strong>{processInfo.instruction}</strong>
+          </p>
+          <div className="setup-link-container">
+            <input type="text" value={processInfo.url} readOnly />
+            <button
+              onClick={() => copyToClipboard(processInfo.url)}
+              className="btn btn-secondary btn-sm"
+            >
+              Copy Link
+            </button>
+          </div>
+          <p className="warning-message">
+            Warning: Ensure this link is delivered securely (e.g., secure chat,
+            in person). Do NOT send via unencrypted email.
+          </p>
+        </div>
       )}
+
+      {/* ... (таблиця запитів без змін, але кнопки викликають нові handleApprove/handleReject) ... */}
+      {!isLoading &&
+        !error &&
+        requests.length === 0 &&
+        !processInfo.url /* Показуємо, тільки якщо немає інфо про обробку */ && (
+          <p>No pending registration requests found.</p>
+        )}
 
       {!isLoading && !error && requests.length > 0 && (
         <table className="requests-table">
+          {/* ... thead ... */}
           <thead>
             <tr>
               <th>Requested At</th>
@@ -103,14 +162,12 @@ const AdminRequestsPage = () => {
                   <button
                     className="btn btn-success btn-sm"
                     onClick={() => handleApprove(req.id)}
-                    title="Approve Request"
                   >
                     Approve
                   </button>
                   <button
                     className="btn btn-danger btn-sm"
                     onClick={() => handleReject(req.id)}
-                    title="Reject Request"
                   >
                     Reject
                   </button>

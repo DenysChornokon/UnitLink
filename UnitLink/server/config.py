@@ -22,6 +22,16 @@ class Config:
     # Дозволяємо запити з React dev server (за замовчуванням порт 3000)
     # У продакшені вкажіть реальний домен фронтенду
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or "http://localhost:3000"
+    FRONTEND_URL = 'http://localhost:3000'
+
+    # Конфігурація Flask-Mail
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')  # Напр., smtp.googlemail.com
+    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)  # 587 для TLS, 465 для SSL
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
+    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL', 'false').lower() in ['true', 'on', '1']
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')  # Ваша пошта для відправки
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')  # Пароль додатка або основний пароль
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or MAIL_USERNAME
 
 
 class DevelopmentConfig(Config):

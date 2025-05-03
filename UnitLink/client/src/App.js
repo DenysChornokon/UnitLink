@@ -5,6 +5,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import DashboardPage from "./pages/DashboardPage/DashboardPage";
 import AdminRequestsPage from "./pages/AdminRequestsPage/AdminRequestsPage";
+import SetPasswordPage from "./pages/SetPasswordPage/SetPasswordPage";
 import { useAuth } from "./contexts/AuthContext";
 
 function App() {
@@ -44,6 +45,8 @@ function App() {
           </AdminRoute>
         }
       />
+
+      <Route path="/set-password" element={<SetPasswordPage />} />
 
       <Route
         path="/"

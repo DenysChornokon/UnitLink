@@ -4,6 +4,8 @@ from flask_jwt_extended import create_access_token, create_refresh_token, get_jw
 from app import db # Імпортуємо db
 from app.models import User, RegistrationRequest, RegistrationRequestStatus # Імпортуємо моделі
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
+from flask import current_app
 
 # Створюємо Blueprint для маршрутів аутентифікації
 auth_bp = Blueprint('auth', __name__)
@@ -153,3 +155,83 @@ def logout():
 # Потрібно буде додати перевірку в `create_app` через `jwt = JWTManager(app)`
 # і @jwt.token_in_blocklist_loader / @jwt.revoked_token_loader
 # Див. документацію Flask-JWT-Extended: "Token Revoking" / "Blocklist"
+
+
+PASSWORD_SETUP_SALT = 'password-setup-salt' # Сіль для токена встановлення паролю
+PASSWORD_SETUP_MAX_AGE = 86400 # 24 години в секундах
+
+@auth_bp.route('/validate-setup-token', methods=['POST'])
+def validate_setup_token():
+    """Перевіряє валідність токена для встановлення паролю."""
+    data = request.get_json()
+    token = data.get('token')
+    if not token:
+        return jsonify(message="Token is required"), 400
+
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        # Перевіряємо токен (підпис, сіль, термін дії)
+        user_id_str = serializer.loads(
+            token,
+            salt=PASSWORD_SETUP_SALT,
+            max_age=PASSWORD_SETUP_MAX_AGE
+        )
+        # Знаходимо користувача
+        user = User.query.filter_by(id=user_id_str, is_active=False).first()
+
+        if not user:
+            # Або токен недійсний для цього користувача, або користувач вже активний
+            return jsonify(valid=False, message="Invalid token or user already active."), 404
+
+        # Токен валідний для неактивованого користувача
+        return jsonify(valid=True, message="Token is valid."), 200
+
+    except SignatureExpired:
+        return jsonify(valid=False, message="Password setup link has expired."), 400
+    except BadTimeSignature:
+         return jsonify(valid=False, message="Invalid token signature or data."), 400
+    except Exception as e:
+        current_app.logger.error(f"Error validating setup token: {e}")
+        return jsonify(valid=False, message="Invalid token."), 400
+
+
+@auth_bp.route('/complete-setup', methods=['POST'])
+def complete_setup():
+    """Встановлює пароль та активує користувача за токеном."""
+    data = request.get_json()
+    token = data.get('token')
+    password = data.get('password')
+
+    if not token or not password:
+        return jsonify(message="Token and password are required"), 400
+
+    # TODO: Додати валідацію складності паролю тут
+
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        user_id_str = serializer.loads(
+            token,
+            salt=PASSWORD_SETUP_SALT,
+            max_age=PASSWORD_SETUP_MAX_AGE
+        )
+        user = User.query.filter_by(id=user_id_str, is_active=False).first()
+
+        if not user:
+            return jsonify(message="Invalid token or user already active."), 404
+
+        # Встановлюємо новий пароль та активуємо користувача
+        user.set_password(password)
+        user.is_active = True
+        # Можна очистити поля токена, якщо вони були в моделі User
+        # user.setup_token_hash = None
+        # user.setup_token_expires_at = None
+
+        db.session.commit()
+        return jsonify(message="Password set successfully. You can now log in."), 200
+
+    except (SignatureExpired, BadTimeSignature):
+        return jsonify(message="Invalid or expired token."), 400
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error completing password setup for user {user_id_str if 'user_id_str' in locals() else 'unknown'}: {e}")
+        return jsonify(message="An error occurred setting the password."), 500
