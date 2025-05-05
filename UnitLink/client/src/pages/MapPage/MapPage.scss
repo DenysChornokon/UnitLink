@@ -1,0 +1,70 @@
+@import '../../styles/variables'; // Імпортуємо змінні
+
+.map-page-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; // Займає всю висоту екрану
+    overflow: hidden; // Запобігаємо прокрутці самої сторінки
+}
+
+// Стилі для обгортки карти (може бути частиною Layout в майбутньому)
+// .map-wrapper {
+//     flex-grow: 1; // Якщо батьківський .main-content це flex-column
+//     // height: 100%; // Або просто 100%, якщо .main-content не flex
+//     width: 100%;
+//     display: flex; // Потрібно для .leaflet-container
+// }
+
+// // Стилі для самого контейнера карти Leaflet
+// .leaflet-container {
+//     height: 100%; // Займає всю висоту .map-wrapper
+//     width: 100%;
+//     z-index: 0;
+// }
+
+
+
+
+.leaflet-container {
+    position: absolute; // <--- ЗМІНЕНО
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    // width: 100%; // Вже не потрібні при top/left/right/bottom=0
+    // height: 100%;
+    z-index: 0; // Залишаємо
+}
+
+// Стилі для тимчасового хедера (якщо ви його додали)
+.map-page-header {
+    padding: 10px 20px;
+    background-color: lighten($primary-color, 5%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0; // Не стискати хедер
+
+    h1 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    p {
+        margin: 0 10px;
+    }
+
+    .btn-logout {
+        background-color: $danger-color;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: darken($danger-color, 10%);
+        }
+    }
+}

@@ -1,0 +1,43 @@
+import React from "react";
+import { Link } from "react-router-dom"; // Для посилання на головну/мапу
+import { useAuth } from "../../contexts/AuthContext";
+import "./Header.scss";
+
+const Header = () => {
+  const { currentUser, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Навігація тепер відбувається всередині logout в AuthContext
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
+  return (
+    <header className="app-header">
+      <div className="header-content">
+        <Link to="/map" className="logo">
+          UnitLink
+        </Link>
+        <nav className="main-nav">
+          {/* Можна додати посилання на інші розділи тут */}
+          <Link to="/map">Map</Link>
+          {currentUser?.role === "ADMIN" && (
+            <Link to="/admin/requests">Admin Requests</Link>
+          )}
+          {/* Додайте інші посилання за потребою */}
+        </nav>
+        <div className="user-info">
+          <span>Role: {currentUser?.role || "Guest"}</span>
+          <button onClick={handleLogout} className="btn btn-logout">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;

@@ -1,0 +1,72 @@
+@import '../../styles/variables'; // Імпорт змінних
+
+.app-header {
+    background-color: darken($primary-color, 10%); // Трохи темніший фон
+    color: white;
+    padding: 0 25px; // Паддінги з боків
+    height: 55px; // Фіксована висота хедера
+    display: flex;
+    align-items: center; // Вирівнювання по вертикалі
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0; // Не стискати хедер
+
+    .header-content {
+        display: flex;
+        justify-content: space-between; // Розподілити елементи
+        align-items: center;
+        width: 100%;
+    }
+
+    .logo {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: white;
+        text-decoration: none;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+
+    .main-nav {
+        a {
+            color: #eee;
+            text-decoration: none;
+            margin: 0 15px; // Відступи між посиланнями
+            font-size: 1rem;
+            transition: color 0.2s ease;
+
+            &:hover,
+            &.active {
+                // Стилізація активного посилання (потребує NavLink)
+                color: white;
+                font-weight: 500;
+            }
+        }
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px; // Відстань між роллю та кнопкою
+
+        span {
+            font-size: 0.9rem;
+        }
+
+        .btn-logout {
+            background-color: $danger-color;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: darken($danger-color, 10%);
+            }
+        }
+    }
+}

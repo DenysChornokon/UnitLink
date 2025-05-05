@@ -126,7 +126,7 @@ def reject_registration_request(request_id):
 
     try:
         db.session.commit()
-        # TODO: Можна надіслати email користувачу про відхилення (якщо налаштувати Mail для інших цілей)
+        # TODO: Можна надіслати email користувачу про відхилення
         return jsonify(message=f"Registration request for '{req.requested_username}' rejected."), 200
     except Exception as e:
         db.session.rollback()

@@ -1,0 +1,31 @@
+// .main-layout {
+//     display: flex;
+//     flex-direction: column; // Розташування елементів у стовпчик
+//     min-height: 100vh; // Займати щонайменше всю висоту екрану
+//     background-color: #f4f7f6; // Можна встановити фон для контенту тут
+// }
+
+// .main-content {
+//     flex-grow: 1; // Дозволяє цій частині займати весь доступний простір між хедером і футером
+//     display: flex; // Часто корисно для дочірніх елементів
+//     flex-direction: column; // Якщо контент має бути стовпчиком
+//     overflow-y: auto; // Додає прокрутку, якщо контент не вміщається (опціонально)
+// }
+
+// src/layouts/MainLayout/MainLayout.scss
+.main-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%; // Явно вказуємо ширину
+    max-width: 100%; // Забороняємо бути ширшим за екран
+    overflow-x: hidden; // Забороняємо горизонтальну прокрутку для самого макета
+}
+
+.main-content {
+    flex-grow: 1;
+    display: flex; // Залишаємо flex для загальної структури, хоча для позиціонування карти він вже не головний
+    flex-direction: column;
+    position: relative; // <--- ДОДАНО: Встановлює контекст для абсолютного позиціонування
+    // overflow: hidden; // Можливо, потрібно буде повернути, якщо карта вилазить
+}

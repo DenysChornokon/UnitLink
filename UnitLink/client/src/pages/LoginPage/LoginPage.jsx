@@ -22,7 +22,7 @@ const LoginPage = () => {
 
     try {
       await login({ username, password });
-      navigate("/dashboard");
+      navigate("/map");
     } catch (err) {
       setError(err.message || "Login failed. Please check your credentials.");
       console.error("Login component failed:", err);

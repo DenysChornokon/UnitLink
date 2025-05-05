@@ -1,13 +1,58 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* src/index.css */
+
+/* 1. Скидання та Box Sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* Включає padding/border в розміри елемента */
+  margin: 0;             /* Прибирає всі зовнішні відступи */
+  padding: 0;            /* Прибирає всі внутрішні відступи */
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* 2. Налаштування HTML та Body */
+html,
+body {
+  width: 100%;           /* Займає всю ширину */
+  height: 100%;          /* Займає всю висоту */
+  overflow-x: hidden;    /* Забороняє горизонтальну прокрутку НАЙВИЩОГО рівня */
+  -webkit-font-smoothing: antialiased; /* Покращення рендерингу шрифтів (опціонально) */
+  -moz-osx-font-smoothing: grayscale;  /* Покращення рендерингу шрифтів (опціонально) */
+}
+
+/* 3. Базові стилі для Body */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+               'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+               sans-serif; /* Типовий системний шрифт-стек */
+  line-height: 1.5;      /* Базова висота рядка */
+  background-color: #f4f7f6; /* Фоновий колір (якщо потрібно, або #fff) */
+  color: #333;            /* Базовий колір тексту */
+}
+
+/* 4. Стилі для кореневого елемента React */
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex; /* Дозволяє .main-layout всередині розтягуватися по висоті */
+  flex-direction: column;
+}
+
+/* 5. Загальні стилі (приклади, додайте свої) */
+a {
+  color: #3498db; /* Базовий колір посилань */
+  text-decoration: none; /* Прибираємо підкреслення */
+}
+
+a:hover {
+  text-decoration: underline; /* Підкреслення при наведенні */
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit; /* Успадковує шрифт */
+}
+
+img {
+   max-width: 100%; /* Запобігає виходу зображень за контейнер */
+   height: auto;
 }

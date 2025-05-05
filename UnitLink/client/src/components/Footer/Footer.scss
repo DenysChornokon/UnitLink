@@ -1,0 +1,15 @@
+@import '../../styles/variables';
+
+.app-footer {
+    background-color: #f1f1f1; // Світлий фон
+    // color: $text-muted-color; // Приглушений текст
+    padding: 10px 25px;
+    text-align: center;
+    border-top: 1px solid $border-color;
+    font-size: 0.85rem;
+    flex-shrink: 0; // Не стискати футер
+
+    p {
+        margin: 0;
+    }
+}
