@@ -24,6 +24,8 @@ def create_app(config_name='default'):
     app_config = config[config_name]
     app.config.from_object(app_config)
 
+    app.url_map.strict_slashes = False
+
     db.init_app(app)
     migrate.init_app(app, db) # Переконайтесь, що migrate тут ініціалізовано
     jwt.init_app(app)

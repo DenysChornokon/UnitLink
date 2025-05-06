@@ -1,5 +1,5 @@
 from .user_models import User, UserRole, RegistrationRequest, RegistrationRequestStatus
-from .device_models import Device, DeviceStatus, DeviceStatusHistory
+from .device_models import Device, DeviceStatus, DeviceStatusHistory, UnitType
 from .log_models import ConnectionLog, LogEventType, Alert, AlertSeverity
 
 # Можна додати __all__ для контролю імпорту '*'
