@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import uuid # Потрібно для конвертації UUID
 
-from app import db
+from app import db, socketio
 # Імпортуємо всі необхідні моделі та Enum'и
 from app.models import Device, UnitType, DeviceStatus, User, DeviceStatusHistory
 from app.decorators import admin_required # Імпортуємо декоратор адміна
@@ -205,53 +205,94 @@ def delete_device(device_id):
 # Або його можна викликати з фронтенду (напр., примусовий пінг) - тоді @jwt_required()
 
 @device_bp.route('/<uuid:device_id>/status', methods=['POST'])
-# @jwt_required() # Можливо, не потрібен, якщо викликається пристроєм
-# Або потрібна інша автентифікація (напр., перевірка API ключа в заголовку)
+# @jwt_required() # Поки що залишаємо без JWT для емуляторів/пристроїв
+# TODO: Реалізувати безпечний механізм автентифікації для цього ендпоінта (напр., API ключі)
 def update_device_status(device_id):
-    """Оновлює статус зв'язку та параметри пристрою."""
-    # TODO: Реалізувати автентифікацію/авторизацію для цього ендпоінта, якщо потрібно
+    """Оновлює статус зв'язку, параметри пристрою та надсилає сповіщення через WebSocket."""
     device = Device.query.get_or_404(device_id)
     data = request.get_json()
+
     if not data:
+        current_app.logger.warning(f"Update status for device {device_id} failed: No JSON data received.")
         return jsonify(message="Request must be JSON"), 400
 
-    current_time = datetime.datetime.now(datetime.timezone.utc) # Поточний час UTC
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+    updated_fields = [] # Список оновлених полів для логування
 
     # Оновлюємо статус зв'язку
-    new_status_str = data.get('status') # 'ONLINE', 'OFFLINE', 'UNSTABLE'
+    new_status_str = data.get('status')
     if new_status_str:
         try:
             new_status_enum = DeviceStatus[new_status_str.upper()]
             if device.status != new_status_enum:
-                 device.status = new_status_enum
-                 # TODO: Записати зміну статусу в ConnectionLog
+                device.status = new_status_enum
+                updated_fields.append(f"status to {new_status_enum.name}")
+                # TODO: Розглянути запис зміни основного статусу (ONLINE/OFFLINE) в ConnectionLog
+                # log_entry = ConnectionLog(event_type=LogEventType.STATUS_CHANGE, ...)
+                # db.session.add(log_entry)
         except KeyError:
-            return jsonify(message=f"Invalid status '{new_status_str}'."), 400
+            current_app.logger.warning(f"Update status for device {device_id} failed: Invalid status value '{new_status_str}'.")
+            return jsonify(message=f"Invalid status '{new_status_str}'. Valid are: {[s.name for s in DeviceStatus]}"), 400
 
     # Оновлюємо час останнього контакту
     device.last_seen = current_time
+    updated_fields.append(f"last_seen to {current_time.isoformat()}")
+
 
     # Отримуємо та зберігаємо параметри в історію
-    signal = data.get('signal_rssi')
-    latency = data.get('latency_ms')
-    packet_loss = data.get('packet_loss_percent')
+    signal_rssi = data.get('signal_rssi')
+    latency_ms = data.get('latency_ms')
+    packet_loss_percent = data.get('packet_loss_percent')
 
-    # Створюємо запис в історії (навіть якщо параметри NULL)
-    # Можна додати логіку, щоб не писати, якщо всі параметри NULL
-    if any(p is not None for p in [signal, latency, packet_loss]):
+    # Конвертуємо у відповідні типи, обробляючи None
+    try:
+        signal_rssi_val = int(signal_rssi) if signal_rssi is not None else None
+        latency_ms_val = int(latency_ms) if latency_ms is not None else None
+        packet_loss_percent_val = float(packet_loss_percent) if packet_loss_percent is not None else None
+    except ValueError:
+        current_app.logger.warning(f"Update status for device {device_id} failed: Invalid parameter format.")
+        return jsonify(message="Invalid parameter format. RSSI and Latency must be integers, Packet Loss must be a number."), 400
+
+
+    # Створюємо запис в історії, якщо хоча б один параметр передано
+    if any(p is not None for p in [signal_rssi_val, latency_ms_val, packet_loss_percent_val]):
         history_entry = DeviceStatusHistory(
             device_id=device.id,
             timestamp=current_time,
-            signal_rssi=int(signal) if signal is not None else None,
-            latency_ms=int(latency) if latency is not None else None,
-            packet_loss_percent=float(packet_loss) if packet_loss is not None else None
+            signal_rssi=signal_rssi_val,
+            latency_ms=latency_ms_val,
+            packet_loss_percent=packet_loss_percent_val
         )
         db.session.add(history_entry)
+        updated_fields.append(f"history_entry (RSSI:{signal_rssi_val}, Latency:{latency_ms_val}, Loss:{packet_loss_percent_val})")
 
     try:
         db.session.commit()
+        current_app.logger.info(f"Device {device_id} status updated: {', '.join(updated_fields)}.")
+
+        # ---> НАДСИЛАЄМО ПОДІЮ WEBSOCKET <---
+        # Перетворюємо оновлений об'єкт device на словник для передачі
+        updated_device_data = device.to_dict()
+        # Додаємо актуальні параметри, якщо вони щойно надійшли (в to_dict їх немає)
+        # to_dict() повертає загальний стан пристрою, а не останній запис історії
+        # Для фронтенду може бути корисно мати останні дані телеметрії разом з оновленням
+        updated_device_data['latest_telemetry'] = {
+            'signal_rssi': signal_rssi_val,
+            'latency_ms': latency_ms_val,
+            'packet_loss_percent': packet_loss_percent_val,
+            'timestamp': current_time.isoformat()
+        }
+
+        # `room=None` означає, що повідомлення буде надіслано всім підключеним клієнтам
+        # У майбутньому можна використовувати кімнати для більш таргетованих оновлень
+        socketio.emit('unit_status_update', updated_device_data, room=None)
+        current_app.logger.info(f"Emitted 'unit_status_update' for device {device_id}.")
+        # --------------------------------------
+
         return jsonify(message="Device status updated successfully."), 200
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"Error updating status for device {device_id}: {e}")
+        current_app.logger.error(f"Error committing status update for device {device_id}: {e}")
+        import traceback
+        current_app.logger.error(traceback.format_exc())
         return jsonify(message="Internal server error updating status."), 500
