@@ -8,6 +8,8 @@ import AdminRequestsPage from "./pages/AdminRequestsPage/AdminRequestsPage";
 import SetPasswordPage from "./pages/SetPasswordPage/SetPasswordPage";
 import { useAuth } from "./contexts/AuthContext";
 import MainLayout from "./layouts/MainLayout/MainLayout";
+import { SocketProvider } from "./contexts/SocketContext";
+import { UnitProvider } from "./contexts/UnitContext";
 
 function App() {
   const { isAuthenticated, currentUser } = useAuth(); // <--- Отримуємо статус автентифікації з контексту
@@ -33,45 +35,48 @@ function App() {
   };
 
   return (
-    // BrowserRouter вже огортає цей компонент в index.js
-    <Routes>
-      {/* Використовуємо isAuthenticated з контексту */}
-      <Route
-        path="/login"
-        element={isAuthenticated ? <Navigate to="/map" /> : <LoginPage />}
-      />
+    <SocketProvider>
+      <UnitProvider>
+        <Routes>
+          {/* Використовуємо isAuthenticated з контексту */}
+          <Route
+            path="/login"
+            element={isAuthenticated ? <Navigate to="/map" /> : <LoginPage />}
+          />
 
-      <Route
-        path="/map"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <MapPage />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/map"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <MapPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
 
-      <Route
-        path="/admin/requests"
-        element={
-          <AdminRoute>
-            <MainLayout>
-              <AdminRequestsPage />
-            </MainLayout>
-          </AdminRoute>
-        }
-      />
+          <Route
+            path="/admin/requests"
+            element={
+              <AdminRoute>
+                <MainLayout>
+                  <AdminRequestsPage />
+                </MainLayout>
+              </AdminRoute>
+            }
+          />
 
-      <Route path="/set-password" element={<SetPasswordPage />} />
+          <Route path="/set-password" element={<SetPasswordPage />} />
 
-      <Route
-        path="/"
-        element={<Navigate to={isAuthenticated ? "/map" : "/login"} />}
-      />
+          <Route
+            path="/"
+            element={<Navigate to={isAuthenticated ? "/map" : "/login"} />}
+          />
 
-      <Route path="*" element={<div>404 Not Found</div>} />
-    </Routes>
+          <Route path="*" element={<div>404 Not Found</div>} />
+        </Routes>
+      </UnitProvider>
+    </SocketProvider>
   );
 }
 

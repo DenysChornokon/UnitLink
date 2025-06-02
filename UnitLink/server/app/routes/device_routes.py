@@ -1,6 +1,6 @@
 # server/app/routes/device_routes.py
 import datetime
-
+from app.models import Device, UnitType, DeviceStatus, User, DeviceStatusHistory, ConnectionLog, LogEventType
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import uuid # Потрібно для конвертації UUID
@@ -224,15 +224,49 @@ def update_device_status(device_id):
     if new_status_str:
         try:
             new_status_enum = DeviceStatus[new_status_str.upper()]
-            if device.status != new_status_enum:
+            # Зберігаємо старий статус перед зміною
+            old_status = device.status
+            if old_status != new_status_enum:
                 device.status = new_status_enum
-                updated_fields.append(f"status to {new_status_enum.name}")
-                # TODO: Розглянути запис зміни основного статусу (ONLINE/OFFLINE) в ConnectionLog
-                # log_entry = ConnectionLog(event_type=LogEventType.STATUS_CHANGE, ...)
-                # db.session.add(log_entry)
+                updated_fields.append(f"status changed from {old_status.name} to {new_status_enum.name}")
+
+                # --- ЛОГІКА ЗАПИСУ В ConnectionLog ---
+                log_message = ""
+                log_event_type = None
+
+                # Подія: втрата зв'язку (був онлайн -> став офлайн)
+                if old_status == DeviceStatus.ONLINE and new_status_enum == DeviceStatus.OFFLINE:
+                    log_event_type = LogEventType.DISCONNECTED
+                    log_message = f"Device '{device.name}' lost connection."
+
+                # Подія: відновлення зв'язку (був офлайн -> став онлайн)
+                elif old_status == DeviceStatus.OFFLINE and new_status_enum == DeviceStatus.ONLINE:
+                    log_event_type = LogEventType.CONNECTED
+                    log_message = f"Device '{device.name}' connection restored."
+
+                # Подія: загальна зміна статусу (напр., на UNSTABLE)
+                elif old_status != new_status_enum:
+                    log_event_type = LogEventType.STATUS_CHANGE
+                    log_message = f"Device '{device.name}' status changed to {new_status_enum.name}."
+
+                if log_event_type:
+                    log_entry = ConnectionLog(
+                        device_id=device.id,
+                        event_type=log_event_type,
+                        message=log_message,
+                        details={  # Зберігаємо трохи контексту
+                            'from_status': old_status.name,
+                            'to_status': new_status_enum.name
+                        }
+                    )
+                    db.session.add(log_entry)
+                # -----------------------------------
+
         except KeyError:
-            current_app.logger.warning(f"Update status for device {device_id} failed: Invalid status value '{new_status_str}'.")
-            return jsonify(message=f"Invalid status '{new_status_str}'. Valid are: {[s.name for s in DeviceStatus]}"), 400
+            current_app.logger.warning(
+                f"Update status for device {device_id} failed: Invalid status value '{new_status_str}'.")
+            return jsonify(
+                message=f"Invalid status '{new_status_str}'. Valid are: {[s.name for s in DeviceStatus]}"), 400
 
     # Оновлюємо час останнього контакту
     device.last_seen = current_time
