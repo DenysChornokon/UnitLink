@@ -32,6 +32,24 @@ class ConnectionLog(db.Model):
     # Додаткові деталі у форматі JSON
     details = db.Column(JSONB, nullable=True)
 
+    # Зв'язок з пристроєм для отримання імені
+    # device = db.relationship('Device', backref=db.backref('connection_logs', lazy='dynamic'))
+
+    def to_dict(self):
+        """Перетворює об'єкт логу в словник для JSON-серіалізації."""
+        return {
+            'id': self.id,
+            'timestamp': self.timestamp.isoformat(),
+            'event_type': self.event_type.name,  # 'CONNECTED', 'DISCONNECTED', etc.
+            'message': self.message,
+            'details': self.details,
+            'device_id': str(self.device_id) if self.device_id else None,
+            # Додаємо ім'я пристрою, якщо він існує
+            'device_name': self.device.name if self.device else "N/A",
+            'user_id': str(self.user_id) if self.user_id else None,
+            'user_name': self.user.username if self.user else None
+        }
+
     # Відносини (не обов'язково завантажувати при кожному запиті логу)
     # device = db.relationship('Device', backref=db.backref('connection_logs', lazy='dynamic')) # Перенесено в Device
     user = db.relationship('User', backref=db.backref('connection_logs', lazy='dynamic'))

@@ -1,0 +1,77 @@
+/* client/src/pages/LogsPage/LogsPage.scss */
+.logs-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    h2 {
+        margin-bottom: 1.5rem;
+    }
+
+    .logs-table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        thead {
+            background-color: #f2f2f2;
+        }
+    }
+
+    .event-type-badge {
+        padding: 0.25em 0.6em;
+        border-radius: 10px;
+        color: white;
+        font-size: 0.8em;
+        text-transform: capitalize;
+
+        &.event-connected {
+            background-color: #28a745;
+        }
+
+        &.event-disconnected {
+            background-color: #dc3545;
+        }
+
+        &.event-status_change {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        &.event-parameter_threshold {
+            background-color: #17a2b8;
+        }
+
+        &.event-user_action {
+            background-color: #6c757d;
+        }
+    }
+
+    .pagination-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.5rem;
+
+        button {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+
+            &:disabled {
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
+        }
+    }
+}

@@ -22,10 +22,10 @@ const Header = () => {
           UnitLink
         </Link>
         <nav className="main-nav">
-          {/* Можна додати посилання на інші розділи тут */}
           <Link to="/map">Map</Link>
+          <Link to="/logs">Logs</Link>
           {currentUser?.role === "ADMIN" && (
-            <Link to="/admin/requests">Admin Requests</Link>
+            <Link to="/admin-requests">Admin Requests</Link>
           )}
           {/* Додайте інші посилання за потребою */}
         </nav>
