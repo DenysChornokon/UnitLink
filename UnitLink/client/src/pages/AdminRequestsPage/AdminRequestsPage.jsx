@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import adminService from "../../services/adminService";
 import { useAuth } from "../../contexts/AuthContext";
 import "./AdminRequestsPage.scss"; // Стилі для сторінки
+import notify from "../../services/notificationService";
 
 const AdminRequestsPage = () => {
   const [requests, setRequests] = useState([]);
@@ -68,13 +69,13 @@ const AdminRequestsPage = () => {
       return;
     try {
       const response = await adminService.rejectRequest(requestId);
-      alert(response.message || "Request rejected successfully!");
+      notify.success(response.message || "Request rejected successfully!");
       // Оновлюємо список
       setRequests((prevRequests) =>
         prevRequests.filter((req) => req.id !== requestId)
       );
     } catch (err) {
-      alert(`Error rejecting request: ${err.message}`);
+      notify.success(`Error rejecting request: ${err.message}`);
     }
   };
 
@@ -82,10 +83,10 @@ const AdminRequestsPage = () => {
   const copyToClipboard = (url) => {
     navigator.clipboard.writeText(url).then(
       () => {
-        alert("Setup link copied to clipboard!");
+        notify.success("Setup link copied to clipboard!");
       },
       (err) => {
-        alert("Failed to copy link. Please copy it manually.");
+        notify.error("Failed to copy link. Please copy it manually.");
         console.error("Clipboard copy failed: ", err);
       }
     );

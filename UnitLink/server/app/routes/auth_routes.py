@@ -38,9 +38,14 @@ def login():
             return jsonify({"message": "An internal error occurred during login."}), 500
 
 
-        # Створюємо токени. Використовуємо user.id (UUID) як identity
-        access_token = create_access_token(identity=str(user.id)) # Перетворюємо UUID в рядок
-        refresh_token = create_refresh_token(identity=str(user.id))
+        # Створюємо токени
+        additional_claims = {"role": user.role.value}  # Використовуємо .value ('admin' або 'operator')
+        access_token = create_access_token(
+            identity=str(user.id),
+            additional_claims=additional_claims
+        )
+        refresh_token = create_refresh_token(
+            identity=str(user.id))
 
         return jsonify(
             message="Login successful",
@@ -117,9 +122,16 @@ def refresh():
     # if is_token_revoked:
     #     return jsonify({"message": "Refresh token has been revoked"}), 401
 
+    user = User.query.get(current_user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
     # Створюємо НОВИЙ access_token
-    new_access_token = create_access_token(identity=current_user_id)
-    return jsonify(access_token=new_access_token), 200
+    additional_claims = {"role": user.role.value}
+    new_access_token = create_access_token(
+        identity=current_user_id,
+        additional_claims=additional_claims
+    )
 
 # TODO: Додати маршрут для виходу ('/logout') - потребує механізму блокування токенів (blacklist)
 # Словник або множина для зберігання JTI відкликаних токенів (ДУЖЕ спрощено, тільки для прикладу!)

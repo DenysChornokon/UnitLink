@@ -1,6 +1,7 @@
 // src/App.js
 import React from "react";
-// BrowserRouter тепер в index.js, тому тут не потрібен
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import MapPage from "./pages/MapPage/MapPage";
@@ -13,23 +14,21 @@ import { UnitProvider } from "./contexts/UnitContext";
 import LogsPage from "./pages/LogsPage/LogsPage";
 import { AlertsProvider } from "./contexts/AlertsContext";
 import AdminUnitsPage from "./pages/AdminUnitsPage/AdminUnitsPage";
+import AdminUsersPage from "./pages/AdminUsersPage/AdminUsersPage";
 
 function App() {
-  const { isAuthenticated, currentUser } = useAuth(); // <--- Отримуємо статус автентифікації з контексту
+  const { isAuthenticated, currentUser } = useAuth();
 
-  // Компонент-обгортка для захисту маршрутів адміна
   const AdminRoute = ({ children }) => {
     if (!isAuthenticated) {
       return <Navigate to="/login" />;
     }
     if (currentUser?.role !== "ADMIN") {
-      // Якщо не адмін, можна перенаправити на дашборд або показати помилку доступу
-      return <Navigate to="/map" />; // або return <div>Access Denied</div>;
+      return <Navigate to="/map" />;
     }
     return children;
   };
 
-  // Компонент для захисту звичайних сторінок
   const ProtectedRoute = ({ children }) => {
     if (!isAuthenticated) {
       return <Navigate to="/login" />;
@@ -38,69 +37,91 @@ function App() {
   };
 
   return (
-    <SocketProvider>
-      <UnitProvider>
-        <AlertsProvider>
-          <Routes>
-            {/* Використовуємо isAuthenticated з контексту */}
-            <Route
-              path="/login"
-              element={isAuthenticated ? <Navigate to="/map" /> : <LoginPage />}
-            />
-
-            <Route
-              path="/map"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <MapPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/admin-requests"
-              element={
-                <AdminRoute>
-                  <MainLayout>
-                    <AdminRequestsPage />
-                  </MainLayout>
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/admin-units"
-              element={
-                <AdminRoute>
-                  <MainLayout>
-                    <AdminUnitsPage />
-                  </MainLayout>
-                </AdminRoute>
-              }
-            />
-
-            <Route
-              path="logs"
-              element={
-                <MainLayout>
-                  <LogsPage />
-                </MainLayout>
-              }
-            />
-
-            <Route path="/set-password" element={<SetPasswordPage />} />
-
-            <Route
-              path="/"
-              element={<Navigate to={isAuthenticated ? "/map" : "/login"} />}
-            />
-
-            <Route path="*" element={<div>404 Not Found</div>} />
-          </Routes>
-        </AlertsProvider>
-      </UnitProvider>
-    </SocketProvider>
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <SocketProvider>
+        <UnitProvider>
+          <AlertsProvider>
+            <Routes>
+              <Route
+                path="/login"
+                element={
+                  isAuthenticated ? <Navigate to="/map" /> : <LoginPage />
+                }
+              />
+              <Route
+                path="/map"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <MapPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin-requests"
+                element={
+                  <AdminRoute>
+                    <MainLayout>
+                      <AdminRequestsPage />
+                    </MainLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin-units"
+                element={
+                  <AdminRoute>
+                    <MainLayout>
+                      <AdminUnitsPage />
+                    </MainLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin-users"
+                element={
+                  <AdminRoute>
+                    <MainLayout>
+                      <AdminUsersPage />
+                    </MainLayout>
+                  </AdminRoute>
+                }
+              />
+              {/* 👇 Для LogsPage, ймовірно, теж потрібен ProtectedRoute */}
+              <Route
+                path="logs"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <LogsPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/set-password" element={<SetPasswordPage />} />
+              <Route
+                path="/"
+                element={<Navigate to={isAuthenticated ? "/map" : "/login"} />}
+              />
+              <Route path="*" element={<div>404 Not Found</div>} />
+            </Routes>
+          </AlertsProvider>
+        </UnitProvider>
+      </SocketProvider>
+    </>
   );
 }
 

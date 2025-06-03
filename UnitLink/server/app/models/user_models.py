@@ -36,6 +36,17 @@ class User(db.Model):
             return False
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
+    def to_dict(self):
+        """Перетворює об'єкт користувача в словник, безпечний для передачі."""
+        return {
+            'id': str(self.id),
+            'username': self.username,
+            'email': self.email,
+            'role': self.role.name,  # Перетворюємо Enum на рядок
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat()
+        }
+
     def __repr__(self):
         return f'<User {self.username} ({self.role.name})>'
 

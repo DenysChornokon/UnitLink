@@ -10,10 +10,10 @@ load_dotenv(os.path.join(basedir, '.env'))
 
 class Config:
     """Базовий клас конфігурації."""
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-should-really-change-this'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'I-should-really-change-this'
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or SECRET_KEY
-    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(seconds=30)
-    JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(days=30)
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=30)
+    JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(days=7)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # За замовчуванням використовуємо SQLite, якщо DATABASE_URL не встановлено
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
@@ -23,6 +23,7 @@ class Config:
     # У продакшені вкажіть реальний домен фронтенду
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or "http://localhost:3000"
     FRONTEND_URL = 'http://localhost:3000'
+    DEVICE_API_KEY = os.environ.get('DEVICE_API_KEY') or 'my_super_secret_device_api_key'
 
     # Конфігурація Flask-Mail
     MAIL_SERVER = os.environ.get('MAIL_SERVER')  # Напр., smtp.googlemail.com

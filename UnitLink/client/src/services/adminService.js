@@ -57,10 +57,55 @@ const rejectRequest = async (requestId) => {
   }
 };
 
+/**
+ * Отримує список всіх користувачів
+ */
+const getUsers = async () => {
+  try {
+      const response = await apiClient.get(`${API_URL}/users`);
+      return response.data.users || [];
+  } catch (error) {
+      console.error("Get Users API error:", error);
+      throw error.response?.data || new Error("Failed to fetch users");
+  }
+};
+
+/**
+* Оновлює дані користувача
+* @param {string} userId
+* @param {object} data - { role?: string, is_active?: boolean }
+*/
+const updateUser = async (userId, data) => {
+  try {
+      const response = await apiClient.put(`${API_URL}/users/${userId}`, data);
+      return response.data;
+  } catch (error) {
+      console.error("Update User API error:", error);
+      throw error.response?.data || new Error("Failed to update user");
+  }
+};
+
+/**
+* Видаляє користувача
+* @param {string} userId
+*/
+const deleteUser = async (userId) => {
+  try {
+      const response = await apiClient.delete(`${API_URL}/users/${userId}`);
+      return response.data;
+  } catch (error) {
+      console.error("Delete User API error:", error);
+      throw error.response?.data || new Error("Failed to delete user");
+  }
+};
+
 const adminService = {
   getPendingRequests,
   approveRequest,
   rejectRequest,
+  getUsers,
+  updateUser,
+  deleteUser,
 };
 
 export default adminService;

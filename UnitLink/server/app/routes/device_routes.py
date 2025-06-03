@@ -45,6 +45,8 @@ def get_device_details(device_id):
         return jsonify(message="Error fetching device details."), 500
 
 
+@device_bp.route('/<uuid:device_id>/history', methods=['GET', 'OPTIONS'])
+@jwt_required()
 def get_device_history(device_id):
     """Повертає історію телеметрії для пристрою за вказаний період."""
     try:
@@ -67,7 +69,7 @@ def get_device_history(device_id):
         return jsonify(message="An internal error occurred."), 500
 
 @device_bp.route('/', methods=['POST'])
-@admin_required() # Тільки адмін може додавати
+@admin_required # Тільки адмін може додавати
 def add_device():
     """Додає новий підрозділ/пристрій."""
     admin_user_id = get_jwt_identity()
@@ -128,7 +130,7 @@ def add_device():
         return jsonify(message="Internal server error. Failed to add device."), 500
 
 @device_bp.route('/<uuid:device_id>', methods=['PUT'])
-@admin_required() # Тільки адмін може редагувати
+@admin_required # Тільки адмін може редагувати
 def update_device(device_id):
     """Оновлює існуючий підрозділ."""
     admin_user_id = get_jwt_identity()
@@ -203,7 +205,7 @@ def update_device(device_id):
 
 
 @device_bp.route('/<uuid:device_id>', methods=['DELETE'])
-@admin_required() # Тільки адмін може видаляти
+@admin_required # Тільки адмін може видаляти
 def delete_device(device_id):
     """Видаляє підрозділ."""
     admin_user_id = get_jwt_identity()

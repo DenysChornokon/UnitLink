@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import unitService from "../../services/unitService";
 import UnitFormModal from "../../components/UnitFormModal/UnitFormModal";
 import "./AdminUnitsPage.scss";
+import notify from "../../services/notificationService";
 
 const AdminUnitsPage = () => {
   const [units, setUnits] = useState([]);
@@ -45,7 +46,7 @@ const AdminUnitsPage = () => {
         // Оновлюємо список, видаливши елемент
         setUnits((prev) => prev.filter((u) => u.id !== unitId));
       } catch (err) {
-        alert(err.message || "Помилка видалення.");
+        notify.error(err.message || "Помилка видалення.");
       }
     }
   };

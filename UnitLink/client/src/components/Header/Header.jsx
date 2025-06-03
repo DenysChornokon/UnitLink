@@ -29,6 +29,7 @@ const Header = () => {
             <>
               <Link to="/admin-requests">Admin Requests</Link>
               <Link to="/admin-units">Manage Units</Link>
+              <Link to="/admin-users">Manage Users</Link>
             </>
           )}
           {/* Додайте інші посилання за потребою */}

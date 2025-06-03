@@ -18,7 +18,7 @@ PASSWORD_SETUP_SALT = 'password-setup-salt'
 PASSWORD_SETUP_MAX_AGE = 86400 # 24 години в секундах
 
 @admin_bp.route('/registration_requests', methods=['GET'])
-@admin_required() # Захищаємо маршрут
+@admin_required # Захищаємо маршрут
 def get_registration_requests():
     """Отримує список запитів на реєстрацію зі статусом PENDING."""
     pending_requests = RegistrationRequest.query.filter_by(
@@ -39,7 +39,7 @@ def get_registration_requests():
     return jsonify(requests=output), 200
 
 @admin_bp.route('/registration_requests/<uuid:request_id>/approve', methods=['POST'])
-@admin_required()
+@admin_required
 def approve_registration_request(request_id):
     """
     Схвалює запит на реєстрацію, створює НЕАКТИВНОГО користувача
@@ -111,7 +111,7 @@ def approve_registration_request(request_id):
 
 
 @admin_bp.route('/registration_requests/<uuid:request_id>/reject', methods=['POST'])
-@admin_required()
+@admin_required
 def reject_registration_request(request_id):
     """Відхиляє запит на реєстрацію."""
     admin_user_id = get_jwt_identity()
@@ -132,3 +132,56 @@ def reject_registration_request(request_id):
         db.session.rollback()
         current_app.logger.error(f"Error rejecting request {request_id}: {e}") # Логування помилки
         return jsonify(message="Internal server error during rejection."), 500
+
+
+# --- МАРШРУТИ ДЛЯ УПРАВЛІННЯ КОРИСТУВАЧАМИ ---
+
+@admin_bp.route('/users', methods=['GET'])
+@admin_required
+def get_users():
+    """Повертає список всіх користувачів."""
+    users = User.query.order_by(User.created_at.desc()).all()
+    return jsonify(users=[user.to_dict() for user in users]), 200
+
+
+@admin_bp.route('/users/<uuid:user_id>', methods=['PUT'])
+@admin_required
+def update_user(user_id):
+    """Оновлює роль або статус користувача."""
+    admin_id = get_jwt_identity()
+    if str(user_id) == admin_id:
+        return jsonify(message="You cannot modify your own account."), 403
+
+    user_to_update = User.query.get_or_404(user_id)
+    data = request.get_json()
+
+    if 'role' in data:
+        try:
+            new_role = UserRole[data['role'].upper()]
+            user_to_update.role = new_role
+        except KeyError:
+            return jsonify(message="Invalid role specified."), 400
+
+    if 'is_active' in data:
+        if isinstance(data['is_active'], bool):
+            user_to_update.is_active = data['is_active']
+        else:
+            return jsonify(message="is_active must be a boolean."), 400
+
+    db.session.commit()
+    return jsonify(message="User updated successfully.", user=user_to_update.to_dict()), 200
+
+
+@admin_bp.route('/users/<uuid:user_id>', methods=['DELETE'])
+@admin_required
+def delete_user(user_id):
+    """Видаляє користувача (Hard Delete)."""
+    admin_id = get_jwt_identity()
+    if str(user_id) == admin_id:
+        return jsonify(message="You cannot delete your own account."), 403
+
+    user_to_delete = User.query.get_or_404(user_id)
+    db.session.delete(user_to_delete)
+    db.session.commit()
+
+    return jsonify(message="User permanently deleted."), 200
