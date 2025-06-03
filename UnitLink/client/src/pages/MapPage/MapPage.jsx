@@ -6,6 +6,7 @@ import L from "leaflet";
 import ReactDOMServer from "react-dom/server";
 import { useUnits } from "../../contexts/UnitContext"; // <-- Головна зміна: імпорт нашого хука
 import "./MapPage.scss";
+import DeviceHistoryModal from "../../components/DeviceHistoryModal/DeviceHistoryModal";
 
 // Імпорти SVG іконок (без змін)
 import { ReactComponent as CommandPostSvg } from "../../assets/icons/command_post.svg";
@@ -85,6 +86,14 @@ const MapPage = () => {
     weight: 1.5,
     opacity: 0.6,
     fillOpacity: 0.0,
+  };
+
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [selectedUnitForHistory, setSelectedUnitForHistory] = useState(null);
+
+  const handleOpenHistoryModal = (unit) => {
+    setSelectedUnitForHistory(unit);
+    setIsHistoryModalOpen(true);
   };
 
   return (
@@ -210,6 +219,12 @@ const MapPage = () => {
                     <strong>Інфо:</strong> {unit.description}
                   </p>
                 )}
+                <button
+                  className="history-btn"
+                  onClick={() => handleOpenHistoryModal(unit)}
+                >
+                  Історія
+                </button>
               </Popup>
             </Marker>
           );
@@ -230,8 +245,14 @@ const MapPage = () => {
           </div>
         )}
       </MapContainer>
+      <DeviceHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        unit={selectedUnitForHistory}
+      />
     </div>
   );
 };
+
 
 export default MapPage;

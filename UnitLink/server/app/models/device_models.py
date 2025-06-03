@@ -85,9 +85,16 @@ class DeviceStatusHistory(db.Model):
     latency_ms = db.Column(db.Integer, nullable=True)  # Затримка
     packet_loss_percent = db.Column(db.Float, nullable=True)  # Відсоток втрати пакетів
 
-    # Можна додати інші параметри: bandwith, noise_level тощо.
-    # Можна використовувати JSONB для зберігання довільних параметрів:
-    # parameters = db.Column(JSONB, nullable=True)
+    def to_dict(self):
+        """Перетворює об'єкт історії в словник."""
+        return {
+            'id': self.id,
+            'timestamp': self.timestamp.isoformat(),
+            'signal_rssi': self.signal_rssi,
+            'latency_ms': self.latency_ms,
+            'packet_loss_percent': self.packet_loss_percent
+        }
+
 
     def __repr__(self):
         return f'<StatusHistory Device {self.device_id} @ {self.timestamp}>'

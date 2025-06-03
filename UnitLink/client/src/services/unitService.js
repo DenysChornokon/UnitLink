@@ -61,11 +61,29 @@ const deleteUnit = async (unitId) => {
   }
 };
 
+/**
+ * Отримує історію телеметрії для підрозділу
+ * @param {string} unitId - ID підрозділу
+ * @param {number} hours - Період в годинах
+ */
+const getUnitHistory = async (unitId, hours = 24) => {
+  try {
+      const response = await apiClient.get(`${API_URL}/${unitId}/history`, {
+          params: { hours }
+      });
+      return response.data.history || [];
+  } catch (error) {
+      console.error("Get Unit History API error:", error.response || error.message);
+      throw error.response?.data || new Error("Failed to fetch unit history");
+  }
+};
+
 const unitService = {
   getUnits,
   addUnit,
   updateUnit,
   deleteUnit,
+  getUnitHistory,
 };
 
 export default unitService;

@@ -4,6 +4,7 @@ from app.models import Device, UnitType, DeviceStatus, User, DeviceStatusHistory
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import uuid # Потрібно для конвертації UUID
+from datetime import timedelta
 
 from app import db, socketio
 # Імпортуємо всі необхідні моделі та Enum'и
@@ -28,7 +29,7 @@ def get_all_devices():
         return jsonify(message="Error fetching device list."), 500
 
 @device_bp.route('/<uuid:device_id>', methods=['GET'])
-@jwt_required() # Захищено
+@jwt_required()
 def get_device_details(device_id):
     """Повертає деталі конкретного підрозділу."""
     current_user_id = get_jwt_identity()
@@ -42,6 +43,28 @@ def get_device_details(device_id):
         current_app.logger.error(f"Error fetching device {device_id}: {e}")
         # Якщо це не 404, то це інша помилка сервера
         return jsonify(message="Error fetching device details."), 500
+
+
+def get_device_history(device_id):
+    """Повертає історію телеметрії для пристрою за вказаний період."""
+    try:
+        # Перевіряємо, чи існує пристрій
+        device = Device.query.get_or_404(device_id)
+
+        # Отримуємо параметр `hours` з запиту, за замовчуванням - 24 години
+        hours_ago = request.args.get('hours', 24, type=int)
+        start_time = datetime.datetime.now(datetime.timezone.utc) - timedelta(hours=hours_ago)
+
+        history_records = DeviceStatusHistory.query.filter(
+            DeviceStatusHistory.device_id == device_id,
+            DeviceStatusHistory.timestamp >= start_time
+        ).order_by(DeviceStatusHistory.timestamp.asc()).all()
+
+        return jsonify(history=[record.to_dict() for record in history_records]), 200
+
+    except Exception as e:
+        current_app.logger.error(f"Error fetching history for device {device_id}: {e}")
+        return jsonify(message="An internal error occurred."), 500
 
 @device_bp.route('/', methods=['POST'])
 @admin_required() # Тільки адмін може додавати
