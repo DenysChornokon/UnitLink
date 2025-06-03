@@ -102,6 +102,12 @@ const DeviceHistoryModal = ({ isOpen, onClose, unit }) => {
     },
   };
 
+  const handleResetZoom = () => {
+    if (chartRef.current) {
+      chartRef.current.resetZoom();
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content large" onClick={(e) => e.stopPropagation()}>
@@ -111,7 +117,16 @@ const DeviceHistoryModal = ({ isOpen, onClose, unit }) => {
         {isLoading ? (
           <p>Завантаження історії...</p>
         ) : (
-          <Line options={chartOptions} data={chartData} />
+          <>
+            <Line ref={chartRef} options={chartOptions} data={chartData} />
+            <button
+              onClick={handleResetZoom}
+              className="btn-secondary"
+              style={{ marginTop: "10px" }}
+            >
+              Reset zoom
+            </button>
+          </>
         )}
       </div>
     </div>
