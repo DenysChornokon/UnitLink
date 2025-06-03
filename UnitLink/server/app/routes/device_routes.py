@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import uuid # Потрібно для конвертації UUID
 from datetime import timedelta
+from app.decorators import device_api_key_required
 
 from app import db, socketio
 # Імпортуємо всі необхідні моделі та Enum'и
@@ -230,7 +231,7 @@ def delete_device(device_id):
 # Або його можна викликати з фронтенду (напр., примусовий пінг) - тоді @jwt_required()
 
 @device_bp.route('/<uuid:device_id>/status', methods=['POST'])
-# @jwt_required() # Поки що залишаємо без JWT для емуляторів/пристроїв
+@device_api_key_required
 # TODO: Реалізувати безпечний механізм автентифікації для цього ендпоінта (напр., API ключі)
 def update_device_status(device_id):
     """Оновлює статус зв'язку, параметри пристрою та надсилає сповіщення через WebSocket."""
