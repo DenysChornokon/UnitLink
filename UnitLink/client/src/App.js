@@ -11,6 +11,7 @@ import MainLayout from "./layouts/MainLayout/MainLayout";
 import { SocketProvider } from "./contexts/SocketContext";
 import { UnitProvider } from "./contexts/UnitContext";
 import LogsPage from "./pages/LogsPage/LogsPage";
+import { AlertsProvider } from "./contexts/AlertsContext";
 
 function App() {
   const { isAuthenticated, currentUser } = useAuth(); // <--- Отримуємо статус автентифікації з контексту
@@ -38,53 +39,55 @@ function App() {
   return (
     <SocketProvider>
       <UnitProvider>
-        <Routes>
-          {/* Використовуємо isAuthenticated з контексту */}
-          <Route
-            path="/login"
-            element={isAuthenticated ? <Navigate to="/map" /> : <LoginPage />}
-          />
+        <AlertsProvider>
+          <Routes>
+            {/* Використовуємо isAuthenticated з контексту */}
+            <Route
+              path="/login"
+              element={isAuthenticated ? <Navigate to="/map" /> : <LoginPage />}
+            />
 
-          <Route
-            path="/map"
-            element={
-              <ProtectedRoute>
+            <Route
+              path="/map"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <MapPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin-requests"
+              element={
+                <AdminRoute>
+                  <MainLayout>
+                    <AdminRequestsPage />
+                  </MainLayout>
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="logs"
+              element={
                 <MainLayout>
-                  <MapPage />
+                  <LogsPage />
                 </MainLayout>
-              </ProtectedRoute>
-            }
-          />
+              }
+            />
 
-          <Route
-            path="/admin-requests"
-            element={
-              <AdminRoute>
-                <MainLayout>
-                  <AdminRequestsPage />
-                </MainLayout>
-              </AdminRoute>
-            }
-          />
+            <Route path="/set-password" element={<SetPasswordPage />} />
 
-          <Route
-            path="logs"
-            element={
-              <MainLayout>
-                <LogsPage />
-              </MainLayout>
-            }
-          />
+            <Route
+              path="/"
+              element={<Navigate to={isAuthenticated ? "/map" : "/login"} />}
+            />
 
-          <Route path="/set-password" element={<SetPasswordPage />} />
-
-          <Route
-            path="/"
-            element={<Navigate to={isAuthenticated ? "/map" : "/login"} />}
-          />
-
-          <Route path="*" element={<div>404 Not Found</div>} />
-        </Routes>
+            <Route path="*" element={<div>404 Not Found</div>} />
+          </Routes>
+        </AlertsProvider>
       </UnitProvider>
     </SocketProvider>
   );

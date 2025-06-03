@@ -47,6 +47,8 @@ def create_app(config_name='default'):
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     from .routes.log_routes import log_bp
     app.register_blueprint(log_bp, url_prefix='/api/logs')
+    from .routes.alert_routes import alert_bp
+    app.register_blueprint(alert_bp, url_prefix='/api/alerts')
 
     # --- Імпорт обробників SocketIO ---
     from . import socket_handlers

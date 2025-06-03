@@ -1,6 +1,6 @@
 # server/app/routes/device_routes.py
 import datetime
-from app.models import Device, UnitType, DeviceStatus, User, DeviceStatusHistory, ConnectionLog, LogEventType
+from app.models import Device, UnitType, DeviceStatus, User, DeviceStatusHistory, ConnectionLog, LogEventType, Alert, AlertSeverity
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import uuid # Потрібно для конвертації UUID
@@ -221,6 +221,8 @@ def update_device_status(device_id):
 
     # Оновлюємо статус зв'язку
     new_status_str = data.get('status')
+    new_alert = None  # змінна для нового алерту
+
     if new_status_str:
         try:
             new_status_enum = DeviceStatus[new_status_str.upper()]
@@ -261,6 +263,15 @@ def update_device_status(device_id):
                     )
                     db.session.add(log_entry)
                 # -----------------------------------
+                # --- ЛОГІКУ СТВОРЕННЯ АЛЕРТУ ---
+                if new_status_enum == DeviceStatus.OFFLINE:
+                    alert_message = f"Пристрій '{device.name}' втратив зв'язок (OFFLINE)."
+                    new_alert = Alert(
+                        device_id=device.id,
+                        severity=AlertSeverity.CRITICAL,
+                        message=alert_message
+                    )
+                    db.session.add(new_alert)
 
         except KeyError:
             current_app.logger.warning(
@@ -316,6 +327,11 @@ def update_device_status(device_id):
             'packet_loss_percent': packet_loss_percent_val,
             'timestamp': current_time.isoformat()
         }
+
+        if new_alert:
+            socketio.emit('new_alert', new_alert.to_dict())
+            current_app.logger.info(f"Emitted 'new_alert' for device {device_id}.")
+        # --------------------------------------
 
         # `room=None` означає, що повідомлення буде надіслано всім підключеним клієнтам
         # У майбутньому можна використовувати кімнати для більш таргетованих оновлень

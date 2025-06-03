@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom"; // Для посилання на головну/мапу
+import AlertsBell from "../AlertsBell/AlertsBell";
 import { useAuth } from "../../contexts/AuthContext";
 import "./Header.scss";
 
@@ -29,7 +30,9 @@ const Header = () => {
           )}
           {/* Додайте інші посилання за потребою */}
         </nav>
+
         <div className="user-info">
+          <AlertsBell />
           <span>Role: {currentUser?.role || "Guest"}</span>
           <button onClick={handleLogout} className="btn btn-logout">
             Logout

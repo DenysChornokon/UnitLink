@@ -80,5 +80,17 @@ class Alert(db.Model):
     # device = db.relationship('Device', backref=db.backref('alerts', lazy=True)) # Перенесено в Device
     acknowledger = db.relationship('User', backref=db.backref('alerts_acknowledged', lazy=True), foreign_keys=[acknowledged_by_user_id])
 
+    def to_dict(self):
+        """Перетворює об'єкт сповіщення в словник."""
+        return {
+            'id': str(self.id),
+            'timestamp': self.timestamp.isoformat(),
+            'severity': self.severity.name,
+            'message': self.message,
+            'is_acknowledged': self.is_acknowledged,
+            'device_id': str(self.device_id) if self.device_id else None,
+            'device_name': self.device.name if self.device else "System Alert"
+        }
+
     def __repr__(self):
          return f'<Alert [{self.severity.name}] {self.message[:50]}>'
