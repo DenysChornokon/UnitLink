@@ -12,6 +12,7 @@ import { SocketProvider } from "./contexts/SocketContext";
 import { UnitProvider } from "./contexts/UnitContext";
 import LogsPage from "./pages/LogsPage/LogsPage";
 import { AlertsProvider } from "./contexts/AlertsContext";
+import AdminUnitsPage from "./pages/AdminUnitsPage/AdminUnitsPage";
 
 function App() {
   const { isAuthenticated, currentUser } = useAuth(); // <--- Отримуємо статус автентифікації з контексту
@@ -64,6 +65,16 @@ function App() {
                 <AdminRoute>
                   <MainLayout>
                     <AdminRequestsPage />
+                  </MainLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin-units"
+              element={
+                <AdminRoute>
+                  <MainLayout>
+                    <AdminUnitsPage />
                   </MainLayout>
                 </AdminRoute>
               }

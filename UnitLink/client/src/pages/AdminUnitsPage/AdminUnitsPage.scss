@@ -1,0 +1,27 @@
+/* client/src/pages/AdminUnitsPage/AdminUnitsPage.scss */
+.admin-units-container {
+    padding: 2rem;
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+    }
+}

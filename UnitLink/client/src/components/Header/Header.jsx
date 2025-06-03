@@ -26,7 +26,10 @@ const Header = () => {
           <Link to="/map">Map</Link>
           <Link to="/logs">Logs</Link>
           {currentUser?.role === "ADMIN" && (
-            <Link to="/admin-requests">Admin Requests</Link>
+            <>
+              <Link to="/admin-requests">Admin Requests</Link>
+              <Link to="/admin-units">Manage Units</Link>
+            </>
           )}
           {/* Додайте інші посилання за потребою */}
         </nav>
