@@ -11,6 +11,7 @@ import {
   TimeScale,
 } from "chart.js";
 import "chartjs-adapter-date-fns"; // Адаптер для роботи з датами
+import zoomPlugin from "chartjs-plugin-zoom";
 
 export const setupCharts = () => {
   ChartJS.register(
@@ -21,6 +22,7 @@ export const setupCharts = () => {
     Title,
     Tooltip,
     Legend,
-    TimeScale
+    TimeScale,
+    zoomPlugin
   );
 };

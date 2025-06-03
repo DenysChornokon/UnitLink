@@ -1,5 +1,5 @@
 // client/src/components/DeviceHistoryModal/DeviceHistoryModal.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Line } from "react-chartjs-2";
 import unitService from "../../services/unitService";
 import "./DeviceHistoryModal.scss";
@@ -7,6 +7,7 @@ import "./DeviceHistoryModal.scss";
 const DeviceHistoryModal = ({ isOpen, onClose, unit }) => {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const chartRef = useRef(null);
 
   useEffect(() => {
     if (isOpen && unit) {
@@ -60,8 +61,30 @@ const DeviceHistoryModal = ({ isOpen, onClose, unit }) => {
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: { position: "top" },
-      title: { display: true, text: `Історія телеметрії для: ${unit.name}` },
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: `Історія телеметрії для: ${unit?.name || "N/A"}`,
+      },
+      zoom: {
+        // <-- НАЛАШТУВАННЯ ДЛЯ chartjs-plugin-zoom
+        pan: {
+          enabled: true, 
+          mode: "xy",
+          // threshold: 5,
+        },
+        zoom: {
+          wheel: {
+            enabled: true, 
+          },
+          pinch: {
+            enabled: true, 
+          },
+          mode: "xy",
+        },
+      },
     },
     scales: {
       x: { type: "time", time: { unit: "hour" } },
