@@ -68,3 +68,9 @@
         }
     }
 }
+
+.leaflet-control-container {
+    .leaflet-top.leaflet-left {
+        // $header-height у нас 60px, $spacing-md - 1rem (зазвичай 16px)
+        // Отже, загальний відступ буде приблизно 76px
+        margin-top: calc(#{$header-height} + #{$spacing-md}); }}

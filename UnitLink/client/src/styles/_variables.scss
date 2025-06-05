@@ -15,3 +15,51 @@ $danger-color: #dc3545;
 $modal-bg-color: #ffffff;
 $overlay-bg-color: rgba(0, 0, 0, 0.75);
 $success-color: #2ecc71; // Зелений для успіху
+
+
+
+// client/src/assets/styles/_variables.scss
+
+// === ШРИФТИ ===
+$font-main: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$font-logo: 'Roboto Condensed', 'Arial Narrow', Impact, sans-serif;
+
+// === КОЛЬОРИ ===
+$primary-darkest: #1e2a38;
+$primary-dark: #2C3E50; // Основний для хедера
+$primary-medium: #34495E;
+$primary-light: #4A6572;
+
+$text-light: #ECF0F1;
+$text-dark: #333333;
+$text-muted: #7f8c8d;
+
+$accent-blue: #3498DB;
+$accent-blue-hover: #2980B9;
+$accent-green: #27AE60;
+$accent-green-hover: #229954;
+
+$status-danger: #C0392B;
+$status-danger-hover: #A93226;
+$status-warning: #F39C12;
+$status-success: $accent-green;
+$status-info: $accent-blue;
+
+$white: #ffffff;
+$light-gray: #f8f9fa;
+$gray-border: #dee2e6;
+$gray-background: #e9ecef; // Для hover в дропдауні
+
+// === РОЗМІРИ ТА ВІДСТУПИ ===
+$header-height: 65px;
+$base-spacing: 1rem;
+$spacing-xs: $base-spacing * 0.25;
+$spacing-sm: $base-spacing * 0.5;
+$spacing-md: $base-spacing;
+$spacing-lg: $base-spacing * 1.5;
+$spacing-xl: $base-spacing * 2;
+
+// === ІНШЕ ===
+$border-radius-base: 4px;
+$box-shadow-base: 0 2px 4px rgba(0, 0, 0, 0.075);
+$z-index-dropdown: 1010;

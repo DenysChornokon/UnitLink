@@ -1,71 +1,104 @@
-@import '../../styles/variables'; // Імпорт змінних
+// client/src/components/Header/Header.scss
+@import '../../styles/variables';
 
 .app-header {
-    background-color: darken($primary-color, 10%); // Трохи темніший фон
-    color: white;
-    padding: 0 25px; // Паддінги з боків
-    height: 55px; // Фіксована висота хедера
+    background-color: $primary-dark;
+    color: $text-light;
+    padding: 0 $spacing-lg;
+    box-shadow: $box-shadow-base;
+    height: $header-height;
     display: flex;
-    align-items: center; // Вирівнювання по вертикалі
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    flex-shrink: 0; // Не стискати хедер
+    align-items: center;
+    position: fixed; // Фіксуємо хедер зверху
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: $z-index-dropdown - 1; // Щоб був нижче за дропдаун, але вище за контент
 
     .header-content {
-        display: flex;
-        justify-content: space-between; // Розподілити елементи
-        align-items: center;
         width: 100%;
-    }
-
-    .logo {
-        font-size: 1.4rem;
-        font-weight: bold;
-        color: white;
-        text-decoration: none;
-
-        &:hover {
-            opacity: 0.9;
-        }
-    }
-
-    .main-nav {
-        a {
-            color: #eee;
-            text-decoration: none;
-            margin: 0 15px; // Відступи між посиланнями
-            font-size: 1rem;
-            transition: color 0.2s ease;
-
-            &:hover,
-            &.active {
-                // Стилізація активного посилання (потребує NavLink)
-                color: white;
-                font-weight: 500;
-            }
-        }
-    }
-
-    .user-info {
+        max-width: 1400px; // Можна додати максимальну ширину для контенту хедера
+        margin: 0 auto; // Центрування контенту хедера, якщо є max-width
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 15px; // Відстань між роллю та кнопкою
 
-        span {
-            font-size: 0.9rem;
-        }
-
-        .btn-logout {
-            background-color: $danger-color;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: background-color 0.2s ease;
+        .logo {
+            font-family: $font-logo;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: $text-light;
+            text-decoration: none;
+            transition: opacity 0.2s ease-in-out;
+            flex-shrink: 0; // Щоб лого не стискалося
 
             &:hover {
-                background-color: darken($danger-color, 10%);
+                opacity: 0.85;
+            }
+        }
+
+        .main-nav {
+            flex-grow: 1; // Дозволяє навігації зайняти центральний простір
+            display: flex;
+            justify-content: center; // Центрує посилання
+            align-items: center;
+            gap: $spacing-sm;
+            min-width: 0; // Для правильного flex-стискання
+            overflow: hidden; // Приховує посилання, що не вміщаються
+
+            // Використовуй NavLink з react-router-dom для автоматичного класу 'active'
+            .nav-link {
+                // Змінено селектор з 'a' на '.nav-link' для більшої специфічності
+                color: $text-light;
+                text-decoration: none;
+                padding: $spacing-sm $spacing-md;
+                border-radius: $border-radius-base;
+                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+                font-weight: 500;
+                position: relative;
+                white-space: nowrap; // Щоб текст посилання не переносився
+
+                &:hover {
+                    background-color: $primary-medium;
+                }
+
+                &.active {
+                    // Стиль для активного посилання
+                    background-color: $primary-light;
+                    font-weight: 700;
+                }
+            }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: $spacing-md;
+            flex-shrink: 0; // Щоб цей блок не стискався
+            position: relative; // Потрібно для абсолютного позиціонування дропдауна
+
+            .alerts-bell-wrapper {
+                // Можна додати стилі, якщо потрібно
+            }
+
+            .profile-icon-button {
+                background: none;
+                border: none;
+                color: $text-light; // Колір іконки
+                cursor: pointer;
+                padding: $spacing-xs; // Невеликий відступ навколо іконки
+                display: flex;
+                align-items: center;
+                border-radius: 50%; // Робимо круглу кнопку, якщо іконка дозволяє
+
+                &:hover {
+                    background-color: $primary-medium;
+                }
+
+                svg {
+                    // Якщо FaUserCircle це SVG
+                    font-size: 1.8em; // Розмір іконки
+                }
             }
         }
     }

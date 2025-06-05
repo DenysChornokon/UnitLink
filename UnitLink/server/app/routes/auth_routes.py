@@ -51,7 +51,9 @@ def login():
             message="Login successful",
             access_token=access_token,
             refresh_token=refresh_token,
-            user_role=user.role.name # Додаємо роль користувача у відповідь
+            user_role=user.role.name,
+            username=user.username,
+            user_id=str(user.id),
         ), 200
     else:
         # Не вказуємо, що саме не так (логін чи пароль) для безпеки

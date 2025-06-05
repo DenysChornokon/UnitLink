@@ -15,6 +15,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("username");
+    localStorage.removeItem("userId");
     setCurrentUser(null);
     console.log("Auth data cleared, navigating to login.");
     navigate("/login");
@@ -24,9 +26,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     const role = localStorage.getItem("userRole");
-    if (token && role) {
-      // TODO: Перевірка валідності токена на бекенді
-      setCurrentUser({ token, role });
+    const username = localStorage.getItem("username");
+    const userId = localStorage.getItem("userId");
+    if (token && role && username && userId) {
+      setCurrentUser({ token, role, username, id: userId });
     }
     setIsLoading(false);
 
@@ -45,13 +48,14 @@ export const AuthProvider = ({ children }) => {
   }, []); // Залежність navigate тут може викликати цикл, якщо navigate змінюється
 
   const login = async (credentials) => {
-    // Логіка логіну залишається без змін, але навігацію перенесено в LoginPage
     const data = await authService.loginUser(credentials);
     if (data.access_token && data.refresh_token && data.user_role) {
       localStorage.setItem("accessToken", data.access_token);
       localStorage.setItem("refreshToken", data.refresh_token);
       localStorage.setItem("userRole", data.user_role);
-      setCurrentUser({ token: data.access_token, role: data.user_role });
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("userId", data.user_id);
+      setCurrentUser({ token: data.access_token, role: data.user_role, username: data.username, id: data.id });
       return true;
     }
     throw new Error(data.message || "Login failed: Invalid response");

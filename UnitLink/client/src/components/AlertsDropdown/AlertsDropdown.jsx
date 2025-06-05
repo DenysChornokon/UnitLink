@@ -3,6 +3,7 @@ import React from "react";
 import { useAlerts } from "../../contexts/AlertsContext";
 import "./AlertsDropdown.scss";
 
+// Розкоментуй визначення компонента та отримання пропсів і даних з контексту
 const AlertsDropdown = ({ setIsOpen }) => {
   const { alerts, acknowledgeAlert } = useAlerts();
 
@@ -10,6 +11,7 @@ const AlertsDropdown = ({ setIsOpen }) => {
     <div className="alerts-dropdown">
       <div className="alerts-header">
         <h4>Активні сповіщення</h4>
+        {/* Розкоментуй та переконайся, що використовується проп setIsOpen */}
         <button onClick={() => setIsOpen(false)} className="close-btn">
           &times;
         </button>
@@ -21,7 +23,12 @@ const AlertsDropdown = ({ setIsOpen }) => {
               <p>
                 <strong>{alert.device_name}</strong>: {alert.message}
               </p>
-              <small>{new Date(alert.timestamp).toLocaleString()}</small>
+              {/* Переконуємось, що timestamp існує перед форматуванням */}
+              <small>
+                {alert.timestamp
+                  ? new Date(alert.timestamp).toLocaleString()
+                  : "час невідомий"}
+              </small>
               <button
                 onClick={() => acknowledgeAlert(alert.id)}
                 className="ack-btn"
