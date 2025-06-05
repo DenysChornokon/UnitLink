@@ -55,7 +55,12 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("userRole", data.user_role);
       localStorage.setItem("username", data.username);
       localStorage.setItem("userId", data.user_id);
-      setCurrentUser({ token: data.access_token, role: data.user_role, username: data.username, id: data.id });
+      setCurrentUser({
+        token: data.access_token,
+        role: data.user_role,
+        username: data.username,
+        id: data.id,
+      });
       return true;
     }
     throw new Error(data.message || "Login failed: Invalid response");
@@ -68,12 +73,26 @@ export const AuthProvider = ({ children }) => {
     clearAuthData(); // Потім очищаємо дані на фронтенді
   };
 
+  // Нова функція для оновлення даних користувача в стані та localStorage
+  const updateCurrentUserData = (updatedFields) => {
+    setCurrentUser((prevUser) => {
+      const newUser = { ...prevUser, ...updatedFields };
+      // Оновлюємо localStorage, якщо поля там є
+      if (updatedFields.username) {
+        localStorage.setItem("username", updatedFields.username);
+      }
+      // Тут можна додати оновлення інших полів, якщо вони зберігаються
+      return newUser;
+    });
+  };
+
   const value = {
     currentUser,
     isAuthenticated: !!currentUser,
     isLoading,
     login,
     logout,
+    updateCurrentUserData,
   };
 
   return (

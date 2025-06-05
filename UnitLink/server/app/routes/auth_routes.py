@@ -287,3 +287,51 @@ def change_password():
         db.session.rollback()
         current_app.logger.error(f"Error changing password for user {user.id}: {e}")
         return jsonify({"message": "An internal error occurred while changing password."}), 500
+
+# ----------------------------------------------------
+
+
+@auth_bp.route('/profile/username', methods=['PUT'])
+@jwt_required()
+def update_username():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    data = request.get_json()
+    new_username = data.get('newUsername')
+
+    if not new_username or not new_username.strip():
+        return jsonify({"message": "New username cannot be empty"}), 400
+
+    # Перевірка довжини (приклад)
+    if len(new_username) < 3 or len(new_username) > 80:
+        return jsonify({"message": "Username must be between 3 and 80 characters"}), 400
+
+    # Перевірка, чи нове ім'я користувача вже не зайняте іншим користувачем
+    existing_user = User.query.filter(User.username == new_username, User.id != current_user_id).first()
+    if existing_user:
+        return jsonify({"message": "This username is already taken"}), 409  # Conflict
+
+    user.username = new_username.strip()
+    try:
+        db.session.commit()
+        # Повертаємо оновлені дані користувача (без пароля, звісно)
+        # Це важливо, щоб фронтенд міг оновити локальні дані
+        return jsonify({
+            "message": "Username updated successfully",
+            "user": {
+                "id": str(user.id),
+                "username": user.username,
+                "email": user.email,  # Email не змінюється тут, але повертаємо для повноти
+                "role": user.role.name,
+                "is_active": user.is_active,
+                "created_at": user.created_at.isoformat()
+            }
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error updating username for user {user.id}: {e}")
+        return jsonify({"message": "An internal error occurred while updating username."}), 500

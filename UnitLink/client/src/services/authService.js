@@ -64,10 +64,26 @@ const changePassword = async (passwordData) => {
   }
 };
 
+/**
+ * Оновлює ім'я користувача
+ * @param {object} usernameData - { newUsername: string }
+ */
+const updateUsername = async (usernameData) => {
+  try {
+      const response = await apiClient.put('/api/auth/profile/username', usernameData);
+      return response.data; // Очікуємо відповідь з оновленими даними користувача
+  } catch (error) {
+      console.error("Update Username API error:", error.response || error.message);
+      throw error.response?.data || error;
+  }
+};
+
 const authService = {
   loginUser,
   registerRequest,
-  logoutUser, // <--- Додано logoutUser
+  logoutUser,
+  changePassword,
+  updateUsername,
 };
 
 export default authService;

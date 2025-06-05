@@ -1,64 +1,130 @@
 // client/src/pages/UserProfilePage/UserProfilePage.scss
-.user-profile-container {
-    max-width: 500px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+@import '../../styles/variables'; // Переконайся, що шлях правильний
 
-    h2 {
-        text-align: center;
-        margin-bottom: 1.5rem;
-        color: #333;
+.user-profile-page {
+    max-width: 650px; // Можна трохи звузити для кращої читабельності форм
+    margin: $spacing-xl auto; // Центрування та відступ зверху/знизу
+    padding: $spacing-lg; // Внутрішній відступ самої сторінки, якщо потрібно
+    background-color: transparent; // Фон сторінки буде таким, як у body або MainLayout
+
+    .profile-section {
+        background-color: $white;
+        padding: $spacing-lg $spacing-xl; // Більші внутрішні відступи для "повітря"
+        border-radius: $border-radius-base * 2; // Більш заокруглені кути
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); // М'якша, але виразніша тінь
+
+        &:not(:last-child) {
+            margin-bottom: $spacing-xl * 1.5; // Збільшена відстань між секціями
+        }
+
+        h2 {
+            font-size: 1.6rem; // Більший заголовок секції
+            color: $primary-dark;
+            margin-top: 0;
+            margin-bottom: $spacing-lg;
+            padding-bottom: $spacing-md;
+            border-bottom: 2px solid $gray-background; // Виразніший розділювач
+            font-weight: 600; // Напівжирний
+        }
     }
 
     .profile-form {
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: $spacing-lg * 1.25;
 
             label {
                 display: block;
-                margin-bottom: 0.5rem;
-                font-weight: bold;
-                color: #555;
+                margin-bottom: $spacing-sm;
+                font-weight: 500; // Середня жирність
+                color: $text-muted; // Трохи приглушений колір
+                font-size: 0.9rem;
             }
 
+            input[type="text"],
             input[type="password"] {
                 width: 100%;
-                padding: 0.75rem;
-                border: 1px solid #ddd;
-                border-radius: 4px;
+                padding: $spacing-md; // Більші поля вводу
+                border: 1px solid $gray-border;
+                border-radius: $border-radius-base;
                 box-sizing: border-box;
+                font-size: 1rem;
+                color: $text-dark;
+                background-color: $light-gray; // Дуже світлий фон для полів
+                transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
                 &:focus {
-                    border-color: #007bff;
+                    border-color: $accent-blue;
                     outline: none;
-                    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                    box-shadow: 0 0 0 0.2rem rgba($accent-blue, 0.2); // М'якша тінь фокусу
+                    background-color: $white;
                 }
             }
         }
 
         .btn-primary {
-            // Використовуй твої глобальні стилі для кнопок, або визнач тут
-            display: block;
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #007bff;
-            color: white;
+            display: inline-block;
+            padding: $spacing-md $spacing-xl; // Збільшені кнопки
+            background-color: $accent-blue;
+            color: $white;
             border: none;
-            border-radius: 4px;
+            border-radius: $border-radius-base;
             cursor: pointer;
             font-size: 1rem;
-            transition: background-color 0.2s ease-in-out;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            text-transform: uppercase; // Великі літери для кнопки
+            letter-spacing: 0.5px;
 
             &:hover {
-                background-color: #0056b3;
+                background-color: $accent-blue-hover;
+                transform: translateY(-1px); // Легкий ефект при наведенні
+            }
+
+            &:active {
+                transform: translateY(0px);
             }
 
             &:disabled {
-                background-color: #ccc;
+                background-color: lighten($accent-blue, 20%);
                 cursor: not-allowed;
+                transform: translateY(0);
+            }
+        }
+    }
+}
+
+// Адаптивність для менших екранів (опціонально)
+@media (max-width: 768px) {
+    .user-profile-page {
+        margin: $spacing-lg auto;
+        padding: $spacing-md;
+
+        .profile-section {
+            padding: $spacing-md $spacing-lg;
+
+            &:not(:last-child) {
+                margin-bottom: $spacing-lg;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+                margin-bottom: $spacing-md;
+            }
+        }
+
+        .profile-form {
+            .form-group {
+                margin-bottom: $spacing-md;
+
+                input[type="text"],
+                input[type="password"] {
+                    padding: $spacing-sm $spacing-md;
+                }
+            }
+
+            .btn-primary {
+                width: 100%; // Кнопки на всю ширину на мобільних
+                padding: $spacing-md;
             }
         }
     }
