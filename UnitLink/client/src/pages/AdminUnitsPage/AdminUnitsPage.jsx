@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import unitService from "../../services/unitService";
 import UnitFormModal from "../../components/UnitFormModal/UnitFormModal";
 import "./AdminUnitsPage.scss";
+import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 import notify from "../../services/notificationService";
 
 const AdminUnitsPage = () => {
@@ -12,6 +13,9 @@ const AdminUnitsPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUnit, setEditingUnit] = useState(null);
+
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [unitToDelete, setUnitToDelete] = useState(null);
 
   const fetchUnits = useCallback(async () => {
     setIsLoading(true);
@@ -39,18 +43,6 @@ const AdminUnitsPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteUnit = async (unitId) => {
-    if (window.confirm("Ви впевнені, що хочете видалити цей підрозділ?")) {
-      try {
-        await unitService.deleteUnit(unitId);
-        // Оновлюємо список, видаливши елемент
-        setUnits((prev) => prev.filter((u) => u.id !== unitId));
-      } catch (err) {
-        notify.error(err.message || "Помилка видалення.");
-      }
-    }
-  };
-
   const handleSaveUnit = async (formData, unitId) => {
     if (unitId) {
       // Редагування
@@ -61,6 +53,32 @@ const AdminUnitsPage = () => {
     }
     // Після збереження оновлюємо весь список
     await fetchUnits();
+  };
+
+  const handleOpenConfirmDeleteModal = (unit) => {
+    setUnitToDelete(unit);
+    setIsConfirmModalOpen(true);
+  };
+
+  const performDeleteUnit = async () => {
+    if (!unitToDelete) return;
+
+    try {
+      await unitService.deleteUnit(unitToDelete.id);
+      setUnits((prevUnits) =>
+        prevUnits.filter((u) => u.id !== unitToDelete.id)
+      );
+      notify.success(`Підрозділ "${unitToDelete.name}" успішно видалено!`);
+    } catch (err) {
+      notify.error(err.message || "Помилка видалення підрозділу.");
+    } finally {
+      setIsConfirmModalOpen(false);
+      setUnitToDelete(null);
+    }
+  };
+
+  const handleDeleteUnit = (unit) => {
+    handleOpenConfirmDeleteModal(unit);
   };
 
   if (isLoading) return <p>Завантаження...</p>;
@@ -98,7 +116,7 @@ const AdminUnitsPage = () => {
                   Редагувати
                 </button>
                 <button
-                  onClick={() => handleDeleteUnit(unit.id)}
+                  onClick={() => handleDeleteUnit(unit)}
                   className="btn-danger"
                 >
                   Видалити
@@ -115,6 +133,20 @@ const AdminUnitsPage = () => {
         onSave={handleSaveUnit}
         initialData={editingUnit}
       />
+
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={performDeleteUnit}
+        title="Підтвердження видалення"
+      >
+        {unitToDelete && (
+          <p>
+            Ви впевнені, що хочете видалити підрозділ{" "}
+            <strong>"{unitToDelete.name}"</strong>?
+          </p>
+        )}
+      </ConfirmModal>
     </div>
   );
 };
