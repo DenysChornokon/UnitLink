@@ -247,3 +247,41 @@ def complete_setup():
         db.session.rollback()
         current_app.logger.error(f"Error completing password setup for user {user_id_str if 'user_id_str' in locals() else 'unknown'}: {e}")
         return jsonify(message="An error occurred setting the password."), 500
+
+# ---------------------------------------------------------------------------------------------------
+
+@auth_bp.route('/change-password', methods=['POST'])
+@jwt_required() # Тільки авторизований користувач може змінити свій пароль
+def change_password():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    data = request.get_json()
+    current_password = data.get('currentPassword')
+    new_password = data.get('newPassword')
+    confirm_password = data.get('confirmPassword')
+
+    if not all([current_password, new_password, confirm_password]):
+        return jsonify({"message": "All password fields are required"}), 400
+
+    if not user.check_password(current_password):
+        return jsonify({"message": "Invalid current password"}), 401 # Unauthorized or 403 Forbidden
+
+    if new_password != confirm_password:
+        return jsonify({"message": "New passwords do not match"}), 400
+
+    # TODO: Додати валідацію складності нового пароля (довжина, символи тощо)
+    # if len(new_password) < 8:
+    #     return jsonify({"message": "New password must be at least 8 characters long"}), 400
+
+    user.set_password(new_password)
+    try:
+        db.session.commit()
+        return jsonify({"message": "Password updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error changing password for user {user.id}: {e}")
+        return jsonify({"message": "An internal error occurred while changing password."}), 500

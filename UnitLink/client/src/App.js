@@ -15,6 +15,7 @@ import LogsPage from "./pages/LogsPage/LogsPage";
 import { AlertsProvider } from "./contexts/AlertsContext";
 import AdminUnitsPage from "./pages/AdminUnitsPage/AdminUnitsPage";
 import AdminUsersPage from "./pages/AdminUsersPage/AdminUsersPage";
+import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
 
 function App() {
   const { isAuthenticated, currentUser } = useAuth();
@@ -107,6 +108,16 @@ function App() {
                   <ProtectedRoute>
                     <MainLayout>
                       <LogsPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="profile"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <UserProfilePage />
                     </MainLayout>
                   </ProtectedRoute>
                 }

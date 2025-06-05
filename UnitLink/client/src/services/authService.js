@@ -49,6 +49,21 @@ const logoutUser = async () => {
   }
 };
 
+/**
+ * Змінює пароль поточного користувача
+ * @param {object} passwordData - { currentPassword, newPassword, confirmPassword }
+ */
+const changePassword = async (passwordData) => {
+  try {
+      const response = await apiClient.post('/api/auth/change-password', passwordData);
+      return response.data;
+  } catch (error) {
+      console.error("Change Password API error:", error.response || error.message);
+      // Перекидаємо помилку, щоб компонент міг її обробити (наприклад, показати повідомлення)
+      throw error.response?.data || error;
+  }
+};
+
 const authService = {
   loginUser,
   registerRequest,

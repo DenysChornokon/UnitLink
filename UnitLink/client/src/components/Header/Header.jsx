@@ -38,6 +38,7 @@ const Header = () => {
         <div className="user-info">
           <AlertsBell />
           <span>Role: {currentUser?.role || "Guest"}</span>
+          <Link to="/profile" className="btn btn-profile" style={{marginRight: '10px'}}>Profile</Link>
           <button onClick={handleLogout} className="btn btn-logout">
             Logout
           </button>
