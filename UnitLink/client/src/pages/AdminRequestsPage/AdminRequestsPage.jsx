@@ -1,22 +1,22 @@
+// client/src/pages/AdminRequestsPage/AdminRequestsPage.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import adminService from "../../services/adminService";
-import { useAuth } from "../../contexts/AuthContext";
-import "./AdminRequestsPage.scss"; // Стилі для сторінки
 import notify from "../../services/notificationService";
+import ConfirmModal from "../../components/ConfirmModal/ConfirmModal"; // Імпортуємо наш модальний компонент
+import { FaCheck, FaTimes, FaCopy } from "react-icons/fa"; // Іконки для дій
+import "./AdminRequestsPage.scss";
 
 const AdminRequestsPage = () => {
   const [requests, setRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [processInfo, setProcessInfo] = useState({
-    requestId: null,
-    url: null,
-    message: null,
-    instruction: null,
-  }); // Ініціалізуємо зі значеннями null
-  const { currentUser } = useAuth(); // Перевіряємо роль (хоча маршрут вже захищений)
+  const [processInfo, setProcessInfo] = useState({ url: null, message: null });
 
-  // Функція для завантаження запитів
+  // Стан для модального вікна підтвердження
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmText, setConfirmText] = useState("");
+
   const fetchRequests = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -30,154 +30,143 @@ const AdminRequestsPage = () => {
     }
   }, []);
 
-  // Завантажуємо запити при першому рендері
   useEffect(() => {
     fetchRequests();
   }, [fetchRequests]);
 
-  const handleApprove = async (requestId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to approve this request? You will need to securely provide the setup link to the user."
-      )
-    )
-      return; // Оновлено текст
-    setProcessInfo({ requestId: null, url: null, message: null }); // Скидаємо попереднє повідомлення
+  const handleApprove = (requestId) => {
+    setConfirmText(
+      "Схвалити цей запит? Потрібно буде безпечно передати посилання користувачу."
+    );
+    setConfirmAction(() => () => performApprove(requestId)); // Зберігаємо дію для виконання
+    setIsConfirmOpen(true);
+  };
+
+  const handleReject = (requestId) => {
+    setConfirmText("Ви впевнені, що хочете відхилити цей запит?");
+    setConfirmAction(() => () => performReject(requestId)); // Зберігаємо дію для виконання
+    setIsConfirmOpen(true);
+  };
+
+  const performApprove = async (requestId) => {
+    setProcessInfo({ url: null, message: null });
     setError(null);
     try {
-      // Викликаємо API схвалення
       const response = await adminService.approveRequest(requestId);
-
-      // Показуємо повідомлення та URL адміну
-      setProcessInfo({
-        requestId: requestId, // Зберігаємо ID, щоб знати до якого запиту відноситься URL
-        url: response.setup_url,
-        message: response.message || "Request approved successfully!",
-      });
-
-      // Оновлюємо список, видаливши оброблений запит
-      setRequests((prevRequests) =>
-        prevRequests.filter((req) => req.id !== requestId)
-      );
+      setProcessInfo({ url: response.setup_url, message: response.message });
+      setRequests((prev) => prev.filter((req) => req.id !== requestId));
     } catch (err) {
-      setError(`Error approving request ${requestId}: ${err.message}`); // Показуємо помилку
+      setError(`Помилка схвалення запиту: ${err.message}`);
     }
   };
 
-  const handleReject = async (requestId) => {
-    if (!window.confirm("Are you sure you want to reject this request?"))
-      return;
+  const performReject = async (requestId) => {
     try {
       const response = await adminService.rejectRequest(requestId);
-      notify.success(response.message || "Request rejected successfully!");
-      // Оновлюємо список
-      setRequests((prevRequests) =>
-        prevRequests.filter((req) => req.id !== requestId)
-      );
+      notify.success(response.message || "Запит успішно відхилено!");
+      setRequests((prev) => prev.filter((req) => req.id !== requestId));
     } catch (err) {
-      notify.success(`Error rejecting request: ${err.message}`);
+      notify.error(`Помилка відхилення запиту: ${err.message}`);
     }
   };
 
-  // Функція для копіювання URL в буфер обміну
   const copyToClipboard = (url) => {
     navigator.clipboard.writeText(url).then(
-      () => {
-        notify.success("Setup link copied to clipboard!");
-      },
-      (err) => {
-        notify.error("Failed to copy link. Please copy it manually.");
-        console.error("Clipboard copy failed: ", err);
-      }
+      () => notify.success("Посилання для встановлення пароля скопійовано!"),
+      () =>
+        notify.error("Не вдалося скопіювати. Будь ласка, зробіть це вручну.")
     );
   };
 
-  // Додаткова перевірка ролі на клієнті (хоча основний захист - на рівні маршрутизації)
-  if (currentUser?.role !== "ADMIN") {
-    return <p>Access Denied. Administrator privileges required.</p>;
-  }
+  const renderEmptyState = () => (
+    <tr className="empty-row">
+      <td colSpan="7">
+        {" "}
+        {/* Змінено на 7 колонок */}
+        <div className="empty-state-content">
+          <h4>Немає запитів на реєстрацію</h4>
+          <p>Коли нові користувачі подадуть запит, він з'явиться тут.</p>
+        </div>
+      </td>
+    </tr>
+  );
 
   return (
-    <div className="admin-requests-page">
-      <h1>Pending Registration Requests</h1>
-      {isLoading && <p>Loading requests...</p>}
+    <div className="admin-page-container">
+      <h2>Запити на реєстрацію</h2>
+      {isLoading && <p>Завантаження запитів...</p>}
       {error && <p className="error-message">{error}</p>}
 
-      {/* Повідомлення після схвалення з посиланням */}
       {processInfo.url && (
-        <div className="process-info success-message">
-          <p>
-            <strong>{processInfo.message}</strong>
-          </p>
-          <p>
-            <strong>{processInfo.instruction}</strong>
+        <div className="process-info-box">
+          <p className="success-message">{processInfo.message}</p>
+          <p className="instruction-message">
+            Будь ласка, безпечно передайте це посилання користувачу:
           </p>
           <div className="setup-link-container">
             <input type="text" value={processInfo.url} readOnly />
             <button
               onClick={() => copyToClipboard(processInfo.url)}
-              className="btn btn-secondary btn-sm"
+              className="btn-secondary"
             >
-              Copy Link
+              <FaCopy />
+              <span>Копіювати</span>
             </button>
           </div>
-          <p className="warning-message">
-            Warning: Ensure this link is delivered securely (e.g., secure chat,
-            in person). Do NOT send via unencrypted email.
-          </p>
         </div>
       )}
 
-      {/* ... (таблиця запитів без змін, але кнопки викликають нові handleApprove/handleReject) ... */}
-      {!isLoading &&
-        !error &&
-        requests.length === 0 &&
-        !processInfo.url /* Показуємо, тільки якщо немає інфо про обробку */ && (
-          <p>No pending registration requests found.</p>
-        )}
-
-      {!isLoading && !error && requests.length > 0 && (
-        <table className="requests-table">
-          {/* ... thead ... */}
-          <thead>
-            <tr>
-              <th>Requested At</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Full Name</th>
-              <th>Rank</th>
-              <th>Reason</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((req) => (
-              <tr key={req.id}>
-                <td>{new Date(req.requested_at).toLocaleString()}</td>
-                <td>{req.requested_username}</td>
-                <td>{req.email}</td>
-                <td>{req.full_name}</td>
-                <td>{req.rank || "-"}</td>
-                <td>{req.reason || "-"}</td>
-                <td>
-                  <button
-                    className="btn btn-success btn-sm"
-                    onClick={() => handleApprove(req.id)}
-                  >
-                    Approve
-                  </button>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleReject(req.id)}
-                  >
-                    Reject
-                  </button>
-                </td>
+      {!isLoading && !error && (
+        <div className="table-wrapper">
+          <table className="requests-table">
+            <thead>
+              <tr>
+                <th>Дата запиту</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>ПІБ</th>
+                <th>Звання</th>
+                <th>Причина</th>
+                <th>Дії</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+                            {requests.length > 0 ? requests.map((req) => (
+                                <tr key={req.id}>
+                                    <td data-label="Дата запиту">{new Date(req.requested_at).toLocaleString('uk-UA')}</td>
+                                    <td data-label="Username">{req.requested_username}</td>
+                                    <td data-label="Email">{req.email}</td>
+                                    <td data-label="ПІБ">{req.full_name}</td>
+                                    <td data-label="Звання">{req.rank || "-"}</td>
+                                    <td data-label="Причина">{req.reason || "-"}</td>
+                                    <td data-label="Дії" className="actions-cell"> {/* Додаємо клас і сюди */}
+                                        <button className="btn-action btn-success" onClick={() => handleApprove(req.id)}>
+                                            <FaCheck />
+                                            <span>Схвалити</span>
+                                        </button>
+                                        <button className="btn-action btn-danger" onClick={() => handleReject(req.id)}>
+                                            <FaTimes />
+                                            <span>Відхилити</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            )) : renderEmptyState()}
+                        </tbody>
+          </table>
+        </div>
       )}
+
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          if (confirmAction) confirmAction();
+          setIsConfirmOpen(false);
+        }}
+        title="Підтвердження дії"
+      >
+        <p>{confirmText}</p>
+      </ConfirmModal>
     </div>
   );
 };

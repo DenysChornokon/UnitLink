@@ -1,15 +1,20 @@
+// client/src/components/Footer/Footer.scss
 @import '../../styles/variables';
 
 .app-footer {
-    background-color: #f1f1f1; // Світлий фон
-    // color: $text-muted-color; // Приглушений текст
-    padding: 10px 25px;
-    text-align: center;
-    border-top: 1px solid $border-color;
-    font-size: 0.85rem;
-    flex-shrink: 0; // Не стискати футер
+    background-color: $primary-dark;
+    color: $text-muted;
+    padding: $spacing-md $spacing-lg;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: auto;
+    width: 100%;
 
-    p {
-        margin: 0;
+    .footer-content {
+        max-width: $container-max-width;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center; 
+        align-items: center;
+        font-size: 0.85em;
     }
 }

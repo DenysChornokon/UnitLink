@@ -1,27 +1,138 @@
-/* client/src/pages/AdminUnitsPage/AdminUnitsPage.scss */
+// client/src/pages/AdminUnitsPage/AdminUnitsPage.scss
+@import '../../styles/variables';
+
 .admin-units-container {
-    padding: 2rem;
+    max-width: $container-max-width;
+    margin: $spacing-xl auto;
+    padding: 0 $spacing-lg;
 
     .page-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: $spacing-lg;
+
+        h2 {
+            font-size: 1.8rem;
+            color: $primary-dark;
+            margin: 0;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: $spacing-sm;
+            padding: $spacing-sm $spacing-md;
+            border: none;
+            border-radius: $border-radius-base;
+            color: $white;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s, transform 0.1s;
+            background-color: $accent-blue;
+            
+                &:hover {
+                    background-color: $accent-blue-hover;
+                }
+        }
+    }
+
+    .table-wrapper {
+        background-color: $white;
+        border-radius: $border-radius-base;
+        box-shadow: $box-shadow-base;
+        width: 100%;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
 
+        thead {
+            @media (max-width: 768px) {
+                display: none;
+            }
+        }
+
+        tbody tr {
+            border-bottom: 1px solid $gray-background;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &:hover {
+                background-color: lighten($gray-background, 4%);
+            }
+
+            @media (max-width: 768px) {
+                display: block;
+                margin-bottom: $spacing-md;
+                border: 1px solid $gray-border;
+                border-radius: $border-radius-base;
+            }
+        }
+
         th,
         td {
-            padding: 0.75rem 1rem;
-            border: 1px solid #ddd;
+            padding: $spacing-md;
+            text-align: left;
+            vertical-align: middle;
+
+            @media (max-width: 768px) {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: right;
+                border-bottom: 1px solid $gray-background;
+
+                &::before {
+                    content: attr(data-label);
+                    font-weight: 600;
+                    color: $text-muted;
+                    text-align: left;
+                    margin-right: $spacing-md;
+                }
+
+                &:last-child {
+                    border-bottom: none;
+                }
+            }
         }
 
         .actions-cell {
             display: flex;
-            gap: 0.5rem;
+            gap: $spacing-sm;
+
+            @media (max-width: 768px) {
+                justify-content: flex-end;
+            }
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: $spacing-sm;
+            padding: $spacing-xs $spacing-sm;
+            font-size: 0.85em;
+            border-radius: $border-radius-base;
+            border: none;
+            color: $white;
+            cursor: pointer;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 0.85;
+            }
+        }
+
+        .btn-edit {
+            background-color: $accent-blue;
+        }
+
+        .btn-danger {
+            background-color: $status-danger;
         }
     }
 }

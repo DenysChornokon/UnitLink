@@ -1,89 +1,212 @@
-@import '../../styles/_variables';
+// client/src/pages/AdminRequestsPage/AdminRequestsPage.scss
+@import '../../styles/variables'; // Переконайся, що шлях до файлу змінних правильний
 
-.admin-requests-page {
-    padding: 20px;
-    max-width: 1200px; // Обмеження ширини для великих екранів
-    margin: 0 auto; // Центрування
+.admin-page-container {
+    max-width: $container-max-width; // Використовуємо глобальну змінну ширини
+    margin: $spacing-xl auto;
+    padding: 0 $spacing-lg; // Горизонтальні падінги для сторінки
 
-    h1 {
-        color: $primary-color;
-        margin-bottom: 25px;
-        border-bottom: 1px solid $table-border-color;
-        padding-bottom: 10px;
+    h2 {
+        font-size: 1.8rem;
+        color: $primary-dark;
+        margin-bottom: $spacing-lg;
+        padding-bottom: $spacing-md;
+        border-bottom: 2px solid $gray-background;
     }
 
-    .error-message {
-        // Стилі для помилок завантаження
-        color: $danger-color;
-        // ... (додайте фон/рамку за бажанням) ...
-    }
-}
+    // Стилі для повідомлення після схвалення запиту
+    .process-info-box {
+        background-color: lighten($status-success, 38%);
+        border-left: 5px solid $status-success;
+        padding: $spacing-md $spacing-lg;
+        margin-bottom: $spacing-lg;
+        border-radius: $border-radius-base;
+        animation: fadeIn 0.3s ease-in-out;
 
-.requests-table {
-    width: 100%;
-    border-collapse: collapse; // Прибираємо подвійні рамки
-    margin-top: 20px;
-    font-size: 0.9rem;
+        .success-message {
+            font-weight: 600;
+            color: darken($status-success, 10%);
+        }
 
-    thead {
-        background-color: $table-header-bg;
+        .instruction-message {
+            font-size: 0.9em;
+            margin-top: $spacing-sm;
+        }
 
-        th {
-            text-align: left;
-            padding: 12px 10px;
-            border: 1px solid $table-border-color;
-            font-weight: bold;
-            color: darken($text-color, 10%);
+        .setup-link-container {
+            display: flex;
+            margin-top: $spacing-md;
+
+            input[type="text"] {
+                flex-grow: 1;
+                border: 1px solid $gray-border;
+                padding: $spacing-sm $spacing-md;
+                border-radius: $border-radius-base 0 0 $border-radius-base;
+                background-color: $white;
+                color: $text-dark;
+                border-right: none;
+                font-size: 0.9em;
+            }
+
+            button {
+                display: inline-flex;
+                align-items: center;
+                gap: $spacing-sm;
+                border-radius: 0 $border-radius-base $border-radius-base 0;
+                background-color: $primary-medium;
+                color: $white;
+                border: 1px solid $primary-medium;
+                cursor: pointer;
+                padding: 0 $spacing-md;
+                transition: background-color 0.2s;
+
+                &:hover {
+                    background-color: $primary-dark;
+                }
+            }
         }
     }
 
-    tbody {
-        tr {
-            &:nth-child(even) {
-                // Чергування кольору рядків для читабельності
-                background-color: #fdfdfd;
+    .table-wrapper {
+        background-color: $white;
+        border-radius: $border-radius-base;
+        box-shadow: $box-shadow-base;
+        width: 100%;
+    }
+
+    .requests-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        // Заголовки таблиці ховаємо на вузьких екранах
+        thead {
+            @media (max-width: 992px) {
+                display: none;
+            }
+        }
+
+        // Стилі для рядків
+        tbody tr {
+            transition: background-color 0.15s ease-in-out;
+            border-bottom: 1px solid $gray-background;
+
+            &:last-child {
+                border-bottom: none;
             }
 
             &:hover {
-                background-color: #f1f1f1; // Підсвітка при наведенні
+                background-color: lighten($gray-background, 4%);
+            }
+
+            // На вузьких екранах кожен рядок стає карткою
+            @media (max-width: 992px) {
+                display: block;
+                margin-bottom: $spacing-md;
+                border: 1px solid $gray-border;
+                border-radius: $border-radius-base;
+                box-shadow: $box-shadow-base;
             }
         }
 
+        // Стилі для комірок
+        th,
         td {
-            padding: 10px 10px;
-            border: 1px solid $table-border-color;
-            vertical-align: middle; // Вирівнювання по центру по вертикалі
+            padding: $spacing-md;
+            text-align: left;
+            vertical-align: middle;
 
-            // Стилі для кнопок дій
-            &:last-child {
-                // Остання колонка (Actions)
+            // На вузьких екранах кожна комірка стає рядком "ключ: значення"
+            @media (max-width: 992px) {
                 display: flex;
-                gap: 8px;
-                justify-content: center;
+                justify-content: space-between;
+                align-items: center;
+                text-align: right;
+                border-bottom: 1px solid $gray-background;
+
+                // Використовуємо data-label для створення "заголовка" зліва
+                &::before {
+                    content: attr(data-label);
+                    font-weight: 600;
+                    color: $text-muted;
+                    text-align: left;
+                    margin-right: $spacing-md;
+                }
+
+                &:last-child {
+                    border-bottom: none;
+                }
             }
+        }
+
+        // Стилі для комірки з кнопками дій
+        .actions-cell {
+            display: flex;
+            gap: $spacing-sm;
+
+            @media (max-width: 992px) {
+                justify-content: flex-end; // Щоб кнопки були справа
+            }
+        }
+
+        // Стилі для кнопок дій
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: $spacing-sm;
+            padding: $spacing-xs $spacing-sm;
+            font-size: 0.85em;
+            border-radius: $border-radius-base;
+            border: none;
+            color: $white;
+            cursor: pointer;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 0.85;
+            }
+        }
+
+        .btn-success {
+            background-color: $status-success;
+        }
+
+        .btn-danger {
+            background-color: $status-danger;
         }
     }
 
-    // Стилі для маленьких кнопок (Approve/Reject)
-    .btn-sm {
-        padding: 5px 10px;
-        font-size: 0.8rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        color: white;
-        transition: opacity 0.2s ease;
+    // Стилі для порожнього стану таблиці
+    .empty-row td {
+        text-align: center;
+        padding: $spacing-xl $spacing-md;
+        border-bottom: none;
+
+        .empty-state-content {
+            h4 {
+                margin: 0 0 $spacing-sm;
+                font-size: 1.2rem;
+                color: $text-dark;
+            }
+
+            p {
+                margin: 0;
+                color: $text-muted;
+            }
+        }
 
         &:hover {
-            opacity: 0.85;
+            background-color: transparent;
         }
     }
+}
 
-    .btn-success {
-        background-color: $success-color;
+// Проста анімація появи
+@keyframes fadeIn {
+    from {
+        opacity: 0;
     }
 
-    .btn-danger {
-        background-color: $danger-color;
+    to {
+        opacity: 1;
     }
 }

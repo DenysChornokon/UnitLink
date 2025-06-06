@@ -1,82 +1,135 @@
-/* client/src/components/UnitFormModal/UnitFormModal.scss */
+// client/src/components/UnitFormModal/UnitFormModal.scss
+@import '../../styles/variables';
+
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6); // Трохи темніший фон
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: $z-index-dropdown + 10; // Має бути вище за все інше
+    animation: fadeIn 0.3s ease;
 }
 
 .modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
+    background: $white;
+    padding: $spacing-xl; // Великі внутрішні відступи
+    border-radius: $border-radius-base * 2; // Більш заокруглені кути
     width: 90%;
-    max-width: 500px;
-    color: #333;
-
-    &.large {
-            max-width: 1000px; 
-            width: 90vw; 
-            min-height: 500px;
-            display: flex; 
-            flex-direction: column;
-    
-            &>canvas {
-                flex-grow: 1;
-            }
-        }
+    max-width: 550px; // Трохи ширше
+    color: $text-dark;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
 
     h2 {
-        margin-top: 0;
+        margin: 0 0 $spacing-lg;
+        padding-bottom: $spacing-md;
+        border-bottom: 1px solid $gray-border;
+        color: $primary-dark;
+        font-size: 1.5rem;
+        font-weight: 600;
     }
 
     .form-group {
-        margin-bottom: 1rem;
-    }
+        margin-bottom: $spacing-lg;
 
-    label {
-        display: block;
-        margin-bottom: 0.5rem;
-    }
+        label {
+            display: block;
+            margin-bottom: $spacing-sm;
+            font-weight: 500;
+            color: $text-muted;
+        }
 
-    input,
-    textarea,
-    select {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: $spacing-md;
+            border: 1px solid $gray-border;
+            border-radius: $border-radius-base;
+            box-sizing: border-box;
+            font-size: 1rem;
+            background-color: $light-gray;
+            color: $text-dark;
+            transition: border-color 0.2s, box-shadow 0.2s;
+
+            &:focus {
+                border-color: $accent-blue;
+                outline: none;
+                box-shadow: 0 0 0 0.2rem rgba($accent-blue, 0.2);
+                background-color: $white;
+            }
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
     }
 
     .form-row {
         display: flex;
-        gap: 1rem;
+        gap: $spacing-md;
+    }
+
+    .error-message {
+        color: $status-danger;
+        background-color: lighten($status-danger, 38%);
+        border: 1px solid lighten($status-danger, 25%);
+        padding: $spacing-md;
+        border-radius: $border-radius-base;
+        margin-top: $spacing-md;
+        text-align: center;
     }
 
     .modal-actions {
-        margin-top: 1.5rem;
+        margin-top: $spacing-lg;
         display: flex;
         justify-content: flex-end;
-        gap: 1rem;
+        gap: $spacing-md;
+
+        // Використовуємо загальні стилі для кнопок
+        .btn-primary,
+        .btn-secondary {
+            padding: $spacing-sm $spacing-lg;
+            border: none;
+            border-radius: $border-radius-base;
+            color: $white;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: $accent-blue;
+
+            &:hover {
+                background-color: $accent-blue-hover;
+            }
+        }
+
+        .btn-secondary {
+            background-color: $text-muted;
+
+            &:hover {
+                background-color: darken($text-muted, 10%);
+            }
+        }
+    }
+}
+
+// Анімація появи для .modal-overlay
+@keyframes fadeIn {
+    from {
+        opacity: 0;
     }
 
-    .close-btn {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: #888;
-        &:hover {
-            color: #333;
-        }
+    to {
+        opacity: 1;
     }
 }

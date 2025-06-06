@@ -17,7 +17,7 @@
 
     .header-content {
         width: 100%;
-        max-width: 1400px; // Можна додати максимальну ширину для контенту хедера
+        max-width: $container-max-width;
         margin: 0 auto; // Центрування контенту хедера, якщо є max-width
         display: flex;
         justify-content: space-between;

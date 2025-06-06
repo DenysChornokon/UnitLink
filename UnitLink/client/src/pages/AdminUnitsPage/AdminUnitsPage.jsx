@@ -2,9 +2,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import unitService from "../../services/unitService";
 import UnitFormModal from "../../components/UnitFormModal/UnitFormModal";
-import "./AdminUnitsPage.scss";
 import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 import notify from "../../services/notificationService";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa"; // Імпортуємо іконки
+import "./AdminUnitsPage.scss";
 
 const AdminUnitsPage = () => {
   const [units, setUnits] = useState([]);
@@ -44,18 +45,22 @@ const AdminUnitsPage = () => {
   };
 
   const handleSaveUnit = async (formData, unitId) => {
-    if (unitId) {
-      // Редагування
-      await unitService.updateUnit(unitId, formData);
-    } else {
-      // Створення
-      await unitService.addUnit(formData);
+    const action = unitId ? "оновлено" : "створено";
+    try {
+      if (unitId) {
+        await unitService.updateUnit(unitId, formData);
+      } else {
+        await unitService.addUnit(formData);
+      }
+      notify.success(`Підрозділ успішно ${action}!`);
+      await fetchUnits();
+    } catch (error) {
+      notify.error(error.message || `Помилка: не вдалося ${action} підрозділ.`);
+      throw error; // Перекидаємо помилку, щоб модальне вікно не закрилося
     }
-    // Після збереження оновлюємо весь список
-    await fetchUnits();
   };
 
-  const handleOpenConfirmDeleteModal = (unit) => {
+  const handleDeleteUnit = (unit) => {
     setUnitToDelete(unit);
     setIsConfirmModalOpen(true);
   };
@@ -77,10 +82,6 @@ const AdminUnitsPage = () => {
     }
   };
 
-  const handleDeleteUnit = (unit) => {
-    handleOpenConfirmDeleteModal(unit);
-  };
-
   if (isLoading) return <p>Завантаження...</p>;
   if (error) return <p className="error-message">{error}</p>;
 
@@ -89,43 +90,48 @@ const AdminUnitsPage = () => {
       <div className="page-header">
         <h2>Управління підрозділами</h2>
         <button onClick={handleOpenAddModal} className="btn-primary">
-          Додати підрозділ
+          <FaPlus />
+          <span>Додати підрозділ</span>
         </button>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Назва (Позивний)</th>
-            <th>Тип</th>
-            <th>Координати</th>
-            <th>Дії</th>
-          </tr>
-        </thead>
-        <tbody>
-          {units.map((unit) => (
-            <tr key={unit.id}>
-              <td>{unit.name}</td>
-              <td>{unit.unit_type}</td>
-              <td>{unit.position?.join(", ")}</td>
-              <td className="actions-cell">
-                <button
-                  onClick={() => handleOpenEditModal(unit)}
-                  className="btn-secondary"
-                >
-                  Редагувати
-                </button>
-                <button
-                  onClick={() => handleDeleteUnit(unit)}
-                  className="btn-danger"
-                >
-                  Видалити
-                </button>
-              </td>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Назва (Позивний)</th>
+              <th>Тип</th>
+              <th>Координати</th>
+              <th>Дії</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {units.map((unit) => (
+              <tr key={unit.id}>
+                <td data-label="Назва (Позивний)">{unit.name}</td>
+                <td data-label="Тип">{unit.unit_type}</td>
+                <td data-label="Координати">{unit.position?.join(", ")}</td>
+                <td data-label="Дії" className="actions-cell">
+                  <button
+                    onClick={() => handleOpenEditModal(unit)}
+                    className="btn-action btn-edit"
+                  >
+                    <FaEdit />
+                    <span>Редагувати</span>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteUnit(unit)}
+                    className="btn-action btn-danger"
+                  >
+                    <FaTrash />
+                    <span>Видалити</span>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <UnitFormModal
         isOpen={isModalOpen}
