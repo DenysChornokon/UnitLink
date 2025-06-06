@@ -7,23 +7,6 @@
     overflow: hidden; // Запобігаємо прокрутці самої сторінки
 }
 
-// Стилі для обгортки карти (може бути частиною Layout в майбутньому)
-// .map-wrapper {
-//     flex-grow: 1; // Якщо батьківський .main-content це flex-column
-//     // height: 100%; // Або просто 100%, якщо .main-content не flex
-//     width: 100%;
-//     display: flex; // Потрібно для .leaflet-container
-// }
-
-// // Стилі для самого контейнера карти Leaflet
-// .leaflet-container {
-//     height: 100%; // Займає всю висоту .map-wrapper
-//     width: 100%;
-//     z-index: 0;
-// }
-
-
-
 
 .leaflet-container {
     position: absolute; // <--- ЗМІНЕНО
@@ -74,3 +57,103 @@
         // $header-height у нас 60px, $spacing-md - 1rem (зазвичай 16px)
         // Отже, загальний відступ буде приблизно 76px
         margin-top: calc(#{$header-height} + #{$spacing-md}); }}
+
+
+// --- СТИЛІ ДЛЯ POPUP ПІДРОЗДІЛУ ---
+// Ми перевизначаємо стандартні класи бібліотеки Leaflet
+
+.leaflet-popup {
+    .leaflet-popup-content-wrapper {
+        background: $white;
+        border-radius: $border-radius-base;
+        box-shadow: $box-shadow-base;
+        border: 1px solid $gray-border;
+    }
+
+    .leaflet-popup-content {
+        margin: 0; // Прибираємо стандартний марджин, будемо керувати через падінги
+        padding: $spacing-md;
+        color: $text-dark;
+        font-family: $font-main;
+        min-width: 240px;
+
+        h4 {
+            // Заголовок
+            margin: 0 0 $spacing-sm;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: $primary-dark;
+            border-bottom: 1px solid $gray-background;
+            padding-bottom: $spacing-sm;
+        }
+
+        p {
+            margin: $spacing-sm 0;
+            font-size: 0.95em;
+            line-height: 1.5;
+
+            strong {
+                color: $text-muted;
+                font-weight: 500;
+                margin-right: $spacing-xs;
+            }
+
+            u {
+                // Стиль для "Останні дані"
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            small {
+                color: $text-muted;
+                font-style: italic;
+            }
+        }
+
+        hr {
+            // Розділювач
+            border: none;
+            border-top: 1px solid $gray-background;
+            margin: $spacing-md 0;
+        }
+
+        // Кнопка "Історія"
+        .history-btn {
+            width: 100%;
+            margin-top: $spacing-md;
+            padding: $spacing-sm;
+            background-color: $accent-blue;
+            color: $white;
+            border: none;
+            border-radius: $border-radius-base;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background-color: $accent-blue-hover;
+            }
+        }
+    }
+
+    // Стрілочка попапу
+    .leaflet-popup-tip-container {
+        .leaflet-popup-tip {
+            background: $white;
+            border: 1px solid $gray-border;
+        }
+    }
+
+    // Кнопка закриття "хрестик"
+    .leaflet-popup-close-button {
+        color: $text-muted !important; // Перевизначаємо колір
+        font-size: 1.5rem !important; // Робимо трохи більшим
+        padding: $spacing-xs $spacing-sm;
+        margin-right: 10px;
+        transition: color 0.2s;
+
+        &:hover {
+            color: $text-dark !important;
+            background: none !important;
+        }
+    } }

@@ -1,2 +1,68 @@
 // client/src/components/DeviceHistoryModal/DeviceHistoryModal.scss
-@import '../UnitFormModal/UnitFormModal.scss';
+@import '../../styles/variables';
+
+// Перевикористовуємо загальні стилі для оверлею та базового контенту модалки
+@import '../ConfirmModal/ConfirmModal.scss';
+
+// Специфічні стилі для модального вікна з графіком
+.modal-content.large {
+    max-width: 1200px; // Робимо вікно значно ширшим
+    width: 95vw;
+    height: 80vh; // Висота займає значну частину екрана
+    display: flex;
+    flex-direction: column; // Розташовуємо елементи вертикально
+    padding: 0; // Прибираємо загальні падінги, щоб контролювати їх у секціях
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: $spacing-md $spacing-lg;
+        border-bottom: 1px solid $gray-border;
+        flex-shrink: 0; // Заголовок не має стискатися
+
+        h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: $primary-dark;
+        }
+
+        .modal-actions-header {
+            display: flex;
+            gap: $spacing-md;
+        }
+
+        .close-btn,
+        .btn-secondary {
+            background: none;
+            border: 1px solid transparent; // Прозора рамка для збереження розміру
+            color: $text-muted;
+            font-size: 1.2rem;
+            padding: $spacing-xs;
+            cursor: pointer;
+            border-radius: $border-radius-base;
+            transition: background-color 0.2s, color 0.2s;
+
+            &:hover {
+                background-color: $gray-background;
+                color: $text-dark;
+            }
+        }
+    }
+
+    .chart-container {
+        flex-grow: 1; // Контейнер графіка займає весь доступний простір
+        padding: $spacing-md;
+        position: relative; // Потрібно для Chart.js, щоб правильно розраховувати розміри
+
+        // Стилі для повідомлення про завантаження
+        p {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: $text-muted;
+        }
+    }
+}

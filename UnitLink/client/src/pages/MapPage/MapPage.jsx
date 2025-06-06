@@ -193,21 +193,21 @@ const MapPage = () => {
                 {unit.unit_type && (
                   <p>
                     <strong>Тип:</strong>{" "}
-                    {unit.unit_type.replace("_", " ").toLowerCase()}
+                    {unit.unit_type.replace("_", " ").toLowerCase()}.
                   </p>
                 )}
                 {unit.status && (
                   <p>
                     <strong>Статус зв'язку:</strong>{" "}
                     <span style={{ color: iconColor, fontWeight: "bold" }}>
-                      {unit.status.toLowerCase()}
+                      {unit.status.toLowerCase()}.
                     </span>
                   </p>
                 )}
                 {unit.latest_telemetry && (
                   <>
-                    <hr style={{ margin: "5px 0" }} />
-                    <p style={{ marginTop: "5px" }}>
+                    <hr/>
+                    <p>
                       <u>Останні дані:</u>
                     </p>
                     {unit.latest_telemetry.signal_rssi !== null && (
@@ -234,12 +234,8 @@ const MapPage = () => {
                   </>
                 )}
                 {unit.description && (
-                  <p
-                    style={{
-                      marginTop: unit.latest_telemetry ? "10px" : "5px",
-                    }}
-                  >
-                    <strong>Інфо:</strong> {unit.description}
+                  <p>
+                    <strong>Інфо:</strong> {unit.description}.
                   </p>
                 )}
                 <button
