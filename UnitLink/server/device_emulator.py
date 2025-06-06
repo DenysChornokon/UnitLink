@@ -6,7 +6,7 @@ import uuid
 
 # --- КОНФІГУРАЦІЯ ЕМУЛЯТОРА ---
 BACKEND_URL = "http://localhost:5000/api/devices"
-EMULATOR_API_KEY = "my_super_secret_device_api_key"
+EMULATOR_API_KEY = '}Tg4[n~a@7G7g"1w,W_!1^)h_c9>a1'
 
 DEVICE_IDS_TO_SIMULATE = [
     "2934aa60-9e0c-498b-b6ab-9a3aced153b3",

@@ -10,7 +10,7 @@ load_dotenv(os.path.join(basedir, '.env'))
 
 class Config:
     """Базовий клас конфігурації."""
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'I-should-really-change-this'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or '74Y*a&3m,c@7Y7RF`K~Io(t{Z0@2x6'
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or SECRET_KEY
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=30)
     JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(days=7)
@@ -23,16 +23,7 @@ class Config:
     # У продакшені вкажіть реальний домен фронтенду
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or "http://localhost:3000"
     FRONTEND_URL = 'http://localhost:3000'
-    DEVICE_API_KEY = os.environ.get('DEVICE_API_KEY') or 'my_super_secret_device_api_key'
-
-    # Конфігурація Flask-Mail
-    MAIL_SERVER = os.environ.get('MAIL_SERVER')  # Напр., smtp.googlemail.com
-    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)  # 587 для TLS, 465 для SSL
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
-    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL', 'false').lower() in ['true', 'on', '1']
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')  # Ваша пошта для відправки
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')  # Пароль додатка або основний пароль
-    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or MAIL_USERNAME
+    DEVICE_API_KEY = os.environ.get('DEVICE_API_KEY') or '}Tg4[n~a@7G7g"1w,W_!1^)h_c9>a1'
 
 
 class DevelopmentConfig(Config):
@@ -40,6 +31,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     # Можна перевизначити DATABASE_URL для розробки, якщо потрібно
     # SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or Config.SQLALCHEMY_DATABASE_URI
+
 
 class ProductionConfig(Config):
     """Конфігурація для продакшену."""
