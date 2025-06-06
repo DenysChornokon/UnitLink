@@ -135,6 +135,8 @@ def refresh():
         additional_claims=additional_claims
     )
 
+    return jsonify(access_token=new_access_token), 200
+
 # TODO: Додати маршрут для виходу ('/logout') - потребує механізму блокування токенів (blacklist)
 # Словник або множина для зберігання JTI відкликаних токенів (ДУЖЕ спрощено, тільки для прикладу!)
 # У РЕАЛЬНОМУ ДОДАТКУ ВИКОРИСТОВУЙТЕ БД АБО REDIS!

@@ -96,9 +96,32 @@ const MapPage = () => {
     setIsHistoryModalOpen(true);
   };
 
+  if (isLoadingUnits) {
+    return (
+      <div className="map-wrapper-loading">
+        {" "}
+        {/* Можеш додати стилі для цього */}
+        <p>Завантаження підрозділів на карті...</p>
+        {/* Тут можна додати спіннер або індикатор завантаження */}
+      </div>
+    );
+  }
+
+  if (errorLoadingUnits) {
+    return (
+      <div className="map-wrapper-error">
+        {" "}
+        {/* Можеш додати стилі для цього */}
+        <p>Помилка завантаження підрозділів: {errorLoadingUnits}</p>
+        <p>Спробуйте оновити сторінку.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="map-wrapper">
       <MapContainer
+        key={units.length}
         center={initialPosition}
         zoom={initialZoom}
         scrollWheelZoom={true}

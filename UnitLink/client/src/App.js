@@ -17,10 +17,14 @@ import AdminUnitsPage from "./pages/AdminUnitsPage/AdminUnitsPage";
 import AdminUsersPage from "./pages/AdminUsersPage/AdminUsersPage";
 import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
 
+
 function App() {
-  const { isAuthenticated, currentUser } = useAuth();
+  const { isAuthenticated, currentUser, isLoading } = useAuth();
 
   const AdminRoute = ({ children }) => {
+    if (isLoading) {
+      return <div>Автентифікація...</div>; // TODO Зробити кращий спіннер
+    }
     if (!isAuthenticated) {
       return <Navigate to="/login" />;
     }
@@ -31,6 +35,9 @@ function App() {
   };
 
   const ProtectedRoute = ({ children }) => {
+    if (isLoading) {
+      return <div>Завантаження...</div>; // TODO Зробити кращий спіннер
+    }
     if (!isAuthenticated) {
       return <Navigate to="/login" />;
     }

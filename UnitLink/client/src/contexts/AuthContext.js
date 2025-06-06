@@ -2,6 +2,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import authService from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -18,6 +19,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("username");
     localStorage.removeItem("userId");
     setCurrentUser(null);
+    delete apiClient.defaults.headers.common["Authorization"];
     console.log("Auth data cleared, navigating to login.");
     navigate("/login");
   };
@@ -48,22 +50,33 @@ export const AuthProvider = ({ children }) => {
   }, []); // Залежність navigate тут може викликати цикл, якщо navigate змінюється
 
   const login = async (credentials) => {
-    const data = await authService.loginUser(credentials);
-    if (data.access_token && data.refresh_token && data.user_role) {
-      localStorage.setItem("accessToken", data.access_token);
-      localStorage.setItem("refreshToken", data.refresh_token);
-      localStorage.setItem("userRole", data.user_role);
-      localStorage.setItem("username", data.username);
-      localStorage.setItem("userId", data.user_id);
-      setCurrentUser({
-        token: data.access_token,
-        role: data.user_role,
-        username: data.username,
-        id: data.id,
-      });
-      return true;
+    setIsLoading(true);
+    try {
+      const data = await authService.loginUser(credentials);
+        if (data.access_token && data.refresh_token && data.user_role) {
+            localStorage.setItem("access_token", data.access_token);
+            localStorage.setItem("refreshToken", data.refresh_token);
+            localStorage.setItem("userRole", data.user_role);
+            localStorage.setItem("username", data.username);
+            localStorage.setItem("userId", data.user_id);
+
+            // Встановлюємо дані користувача
+            setCurrentUser({
+              token: data.access_token,
+              role: data.user_role,
+              username: data.username,
+              id: data.id,
+            });
+            return true;
+        }
+        throw new Error(data.message || "Login failed: Invalid response");
+    } catch (error) {
+      clearAuthData(); // Очищаємо, щоб не було залишків
+      console.error("Login process failed:", error);
+      throw error; // Перекидаємо помилку далі
+    } finally {
+      setIsLoading(false);
     }
-    throw new Error(data.message || "Login failed: Invalid response");
   };
 
   // Оновлена функція виходу
