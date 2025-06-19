@@ -51,18 +51,27 @@
         }
     }
 
-    .chart-container {
-        flex-grow: 1; // Контейнер графіка займає весь доступний простір
-        padding: $spacing-md;
-        position: relative; // Потрібно для Chart.js, щоб правильно розраховувати розміри
+        .charts-grid-container {
+            flex-grow: 1;
+            padding: $spacing-md;
+            position: relative;
+    
 
-        // Стилі для повідомлення про завантаження
-        p {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: $text-muted;
-        }
-    }
-}
+            display: grid;
+            grid-template-rows: repeat(3, 1fr); // 3 рядки однакової висоти
+            gap: $spacing-lg; // Відстань між графіками
+    
+            .chart-item {
+                position: relative; // Кожен графік у своєму контейнері
+                width: 100%;
+                height: 100%;
+            }
+    
+            // Стилі для повідомлення про завантаження
+            p {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: $text-muted;
+            }     }}

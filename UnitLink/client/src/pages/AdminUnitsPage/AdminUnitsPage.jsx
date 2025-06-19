@@ -88,10 +88,10 @@ const AdminUnitsPage = () => {
   return (
     <div className="admin-units-container">
       <div className="page-header">
-        <h2>Управління підрозділами</h2>
+        <h2>Units Management</h2>
         <button onClick={handleOpenAddModal} className="btn-primary">
           <FaPlus />
-          <span>Додати підрозділ</span>
+          <span>Add Unit</span>
         </button>
       </div>
 
@@ -99,10 +99,10 @@ const AdminUnitsPage = () => {
         <table>
           <thead>
             <tr>
-              <th>Назва (Позивний)</th>
-              <th>Тип</th>
-              <th>Координати</th>
-              <th>Дії</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Coordinates</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -117,14 +117,14 @@ const AdminUnitsPage = () => {
                     className="btn-action btn-edit"
                   >
                     <FaEdit />
-                    <span>Редагувати</span>
+                    <span>Edit</span>
                   </button>
                   <button
                     onClick={() => handleDeleteUnit(unit)}
                     className="btn-action btn-danger"
                   >
                     <FaTrash />
-                    <span>Видалити</span>
+                    <span>Delete</span>
                   </button>
                 </td>
               </tr>
@@ -148,7 +148,7 @@ const AdminUnitsPage = () => {
       >
         {unitToDelete && (
           <p>
-            Ви впевнені, що хочете видалити підрозділ{" "}
+            Are you sure you want to delere the unit{" "}
             <strong>"{unitToDelete.name}"</strong>?
           </p>
         )}

@@ -24,17 +24,17 @@ const RoleIcon = currentUser?.role === "ADMIN" ? FaUserShield : FaUserCircle;
           <span className="username">
             {currentUser?.username || "Користувач"}
           </span>
-          <span className="role">Роль: {currentUser?.role || "Гість"}</span>
+          <span className="role">Role: {currentUser?.role || "Гість"}</span>
         </div>
       </div>
       <hr className="dropdown-divider" />
       <Link to="/profile" className="dropdown-item">
         <FaUserEdit className="dropdown-item-icon" />
-        <span>Мій профіль</span>
+        <span>My Profile</span>
       </Link>
       <button onClick={onLogout} className="dropdown-item logout-button">
         <FaSignOutAlt className="dropdown-item-icon" />
-        <span>Вийти</span>
+        <span>Leave</span>
       </button>
     </div>
   );

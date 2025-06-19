@@ -2,29 +2,60 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Line } from "react-chartjs-2";
 import unitService from "../../services/unitService";
-import { FaUndo, FaTimes } from "react-icons/fa"; // Іконки для кнопок
+import { FaUndo, FaTimes } from "react-icons/fa";
 import "./DeviceHistoryModal.scss";
 
-// Визначимо кольори, що відповідають нашій палітрі в _variables.scss
-// Ми не можемо імпортувати SCSS змінні в JS, тому дублюємо значення тут
+// Кольори для графіків, що відповідають нашій палітрі
 const chartColors = {
-  rssi: "#3498DB", // $accent-blue
-  latency: "#E74C3C", // Близько до $status-danger
-  loss: "#F39C12", // $status-warning
-  grid: "#e9ecef", // $gray-background
-  text: "#7f8c8d", // $text-muted
+  rssi: "#3498DB",
+  latency: "#E74C3C",
+  loss: "#F39C12",
+  grid: "#e9ecef",
+  text: "#7f8c8d",
+};
+
+// Базові опції, спільні для всіх графіків
+const baseChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  interaction: {
+    mode: "index",
+    intersect: false,
+  },
+  plugins: {
+    legend: { display: false }, // Легенда не потрібна для графіка з однією лінією
+    tooltip: {
+      titleFont: { family: "'Roboto', sans-serif" },
+      bodyFont: { family: "'Roboto', sans-serif" },
+    },
+    zoom: {
+      pan: { enabled: true, mode: "x" },
+      zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: "x" },
+    },
+  },
+  scales: {
+    x: {
+      type: "time",
+      time: { unit: "hour", tooltipFormat: "PP HH:mm:ss" },
+      grid: { color: chartColors.grid },
+      ticks: {
+        color: chartColors.text,
+        font: { family: "'Roboto', sans-serif" },
+      },
+    },
+  },
 };
 
 const DeviceHistoryModal = ({ isOpen, onClose, unit }) => {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const chartRef = useRef(null);
+  const chartsRef = useRef([]); // Використовуємо масив ref-ів для всіх графіків
 
   useEffect(() => {
     if (isOpen && unit) {
       const fetchHistory = async () => {
         setIsLoading(true);
-        setHistory([]); // Очищуємо попередні дані
+        setHistory([]);
         try {
           const data = await unitService.getUnitHistory(unit.id);
           setHistory(data);
@@ -39,105 +70,114 @@ const DeviceHistoryModal = ({ isOpen, onClose, unit }) => {
   }, [isOpen, unit]);
 
   const handleResetZoom = () => {
-    if (chartRef.current) {
-      chartRef.current.resetZoom();
-    }
+    chartsRef.current.forEach((chartInstance) => {
+      if (chartInstance) {
+        chartInstance.resetZoom();
+      }
+    });
   };
 
   if (!isOpen) return null;
 
-  // Готуємо дані для графіка
-  const chartData = {
-    labels: history.map((h) => new Date(h.timestamp)),
-    datasets: [
-      {
-        label: "Рівень сигналу (RSSI)",
-        data: history.map((h) => h.signal_rssi),
-        borderColor: chartColors.rssi,
-        backgroundColor: `${chartColors.rssi}33`, // той же колір з прозорістю
-        tension: 0.1,
-        yAxisID: "y_rssi",
+  // Готуємо дані та опції для кожного графіка окремо
+  const labels = history.map((h) => new Date(h.timestamp));
+
+  const rssiChart = {
+    options: {
+      ...baseChartOptions,
+      plugins: {
+        ...baseChartOptions.plugins,
+        title: {
+          display: true,
+          text: "Рівень сигналу (RSSI)",
+          color: chartColors.text,
+        },
       },
-      {
-        label: "Затримка (ms)",
-        data: history.map((h) => h.latency_ms),
-        borderColor: chartColors.latency,
-        backgroundColor: `${chartColors.latency}33`,
-        tension: 0.1,
-        yAxisID: "y_latency",
+      scales: {
+        ...baseChartOptions.scales,
+        y: {
+          title: { display: true, text: "dBm" },
+          ticks: { color: chartColors.rssi },
+        },
       },
-      {
-        label: "Втрата пакетів (%)",
-        data: history.map((h) => h.packet_loss_percent),
-        borderColor: chartColors.loss,
-        backgroundColor: `${chartColors.loss}33`,
-        tension: 0.1,
-        yAxisID: "y_loss",
-      },
-    ],
+    },
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "RSSI",
+          data: history.map((h) => h.signal_rssi),
+          borderColor: chartColors.rssi,
+          backgroundColor: `${chartColors.rssi}33`,
+          tension: 0.1,
+        },
+      ],
+    },
   };
 
-  // Готуємо опції для графіка
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false, // Дозволяє графіку заповнити контейнер по висоті
-    interaction: {
-      mode: "index",
-      intersect: false,
-    },
-    plugins: {
-      legend: {
-        position: "bottom",
-        labels: {
+  const latencyChart = {
+    options: {
+      ...baseChartOptions,
+      plugins: {
+        ...baseChartOptions.plugins,
+        title: {
+          display: true,
+          text: "Затримка (ms)",
           color: chartColors.text,
-          font: { family: "'Roboto', sans-serif" },
         },
       },
-      tooltip: {
-        titleFont: { family: "'Roboto', sans-serif" },
-        bodyFont: { family: "'Roboto', sans-serif" },
-      },
-      // Заголовок тепер буде в розмітці, а не в опціях
-      title: { display: false },
-      zoom: {
-        pan: { enabled: true, mode: "x" },
-        zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: "x" },
+      scales: {
+        ...baseChartOptions.scales,
+        y: {
+          title: { display: true, text: "ms" },
+          ticks: { color: chartColors.latency },
+        },
       },
     },
-    scales: {
-      x: {
-        type: "time",
-        time: { unit: "hour", tooltipFormat: "PP HH:mm:ss" },
-        grid: { color: chartColors.grid },
-        ticks: {
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Latency",
+          data: history.map((h) => h.latency_ms),
+          borderColor: chartColors.latency,
+          backgroundColor: `${chartColors.latency}33`,
+          tension: 0.1,
+        },
+      ],
+    },
+  };
+
+  const lossChart = {
+    options: {
+      ...baseChartOptions,
+      plugins: {
+        ...baseChartOptions.plugins,
+        title: {
+          display: true,
+          text: "Втрата пакетів (%)",
           color: chartColors.text,
-          font: { family: "'Roboto', sans-serif" },
         },
       },
-      y_rssi: {
-        type: "linear",
-        position: "left",
-        title: { display: true, text: "RSSI (dBm)", color: chartColors.text },
-        grid: { drawOnChartArea: false }, // Прибираємо сітку для цієї осі
-        ticks: { color: chartColors.rssi },
-      },
-      y_latency: {
-        type: "linear",
-        position: "right",
-        title: { display: true, text: "Latency (ms)", color: chartColors.text },
-        ticks: { color: chartColors.latency },
-      },
-      y_loss: {
-        type: "linear",
-        position: "right",
-        title: { display: true, text: "Loss (%)", color: chartColors.text },
-        grid: { drawOnChartArea: false }, // Прибираємо сітку
-        ticks: { color: chartColors.loss },
-        // Розміщуємо цю вісь трохи далі праворуч
-        afterFit: (scaleInstance) => {
-          scaleInstance.width = 50;
+      scales: {
+        ...baseChartOptions.scales,
+        y: {
+          title: { display: true, text: "%" },
+          ticks: { color: chartColors.loss, stepSize: 1 },
         },
       },
+    },
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Packet Loss",
+          data: history.map((h) => h.packet_loss_percent),
+          borderColor: chartColors.loss,
+          backgroundColor: `${chartColors.loss}33`,
+          tension: 0.1,
+        },
+      ],
     },
   };
 
@@ -159,11 +199,33 @@ const DeviceHistoryModal = ({ isOpen, onClose, unit }) => {
             </button>
           </div>
         </div>
-        <div className="chart-container">
+        <div className="charts-grid-container">
           {isLoading ? (
             <p>Завантаження історії...</p>
           ) : (
-            <Line ref={chartRef} options={chartOptions} data={chartData} />
+            <>
+              <div className="chart-item">
+                <Line
+                  ref={(el) => (chartsRef.current[0] = el)}
+                  options={rssiChart.options}
+                  data={rssiChart.data}
+                />
+              </div>
+              <div className="chart-item">
+                <Line
+                  ref={(el) => (chartsRef.current[1] = el)}
+                  options={latencyChart.options}
+                  data={latencyChart.data}
+                />
+              </div>
+              <div className="chart-item">
+                <Line
+                  ref={(el) => (chartsRef.current[2] = el)}
+                  options={lossChart.options}
+                  data={lossChart.data}
+                />
+              </div>
+            </>
           )}
         </div>
       </div>

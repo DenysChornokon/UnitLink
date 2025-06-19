@@ -73,7 +73,7 @@ const UnitFormModal = ({ isOpen, onClose, onSave, initialData }) => {
         <h2>{isEditing ? "Редагувати підрозділ" : "Створити підрозділ"}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Назва (Позивний)</label>
+            <label>Name</label>
             <input
               type="text"
               name="name"
@@ -92,7 +92,7 @@ const UnitFormModal = ({ isOpen, onClose, onSave, initialData }) => {
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>Широта (Latitude)</label>
+              <label>Latitude</label>
               <input
                 type="number"
                 step="any"
@@ -103,7 +103,7 @@ const UnitFormModal = ({ isOpen, onClose, onSave, initialData }) => {
               />
             </div>
             <div className="form-group">
-              <label>Довгота (Longitude)</label>
+              <label>Longitude</label>
               <input
                 type="number"
                 step="any"
@@ -115,7 +115,7 @@ const UnitFormModal = ({ isOpen, onClose, onSave, initialData }) => {
             </div>
           </div>
           <div className="form-group">
-            <label>Тип підрозділу</label>
+            <label>Unit type</label>
             <select
               name="unit_type"
               value={formData.unit_type}
@@ -133,10 +133,10 @@ const UnitFormModal = ({ isOpen, onClose, onSave, initialData }) => {
 
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn-secondary">
-              Скасувати
+              Cancel
             </button>
             <button type="submit" className="btn-primary">
-              Зберегти
+              Confirm
             </button>
           </div>
         </form>

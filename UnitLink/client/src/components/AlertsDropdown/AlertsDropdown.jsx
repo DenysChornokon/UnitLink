@@ -10,7 +10,7 @@ const AlertsDropdown = ({ setIsOpen }) => {
   return (
     <div className="alerts-dropdown">
       <div className="alerts-header">
-        <h4>Активні сповіщення</h4>
+        <h4>Active Notifications</h4>
         {/* Розкоментуй та переконайся, що використовується проп setIsOpen */}
         <button onClick={() => setIsOpen(false)} className="close-btn">
           &times;
@@ -33,12 +33,12 @@ const AlertsDropdown = ({ setIsOpen }) => {
                 onClick={() => acknowledgeAlert(alert.id)}
                 className="ack-btn"
               >
-                Прочитано
+                Read
               </button>
             </div>
           ))
         ) : (
-          <p className="no-alerts">Немає активних сповіщень.</p>
+          <p className="no-alerts">No Active Notifications.</p>
         )}
       </div>
     </div>
