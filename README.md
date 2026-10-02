@@ -72,4 +72,4 @@ By implementing this monitoring application, command centers gain enhanced situa
 
 ## Documentation Reference
 
-For an in-depth exploration of the military communication landscape, EW threats, and the scientific justification for this software, please refer to the primary research document: AFU_Communication_Channels_Monitoring_Web_Application**.docx**.
+For an in-depth exploration of the military communication landscape, EW threats, and the scientific justification for this software, please refer to the primary research document: AFU_Communication_Channels_Monitoring_Web_Application.docx.
