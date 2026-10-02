@@ -48,7 +48,7 @@ The application provides a comprehensive Network Operations Center (NOC) dashboa
 
 * Assists in bridging the gap between COTS solutions and military-grade (Mil-Spec) networks.
 
-## Technology Stack (Proposed)
+## Technology Stack
 
 * **Frontend:** React.js / Vue.js (for dynamic, real-time dashboard visualization)
 
